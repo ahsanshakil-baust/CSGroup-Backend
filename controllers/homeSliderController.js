@@ -11,37 +11,61 @@ const getAllSliderDetails = (req, res, next) => {
 
 const getSliderDetails = (req, res, next) => {
   const { id } = req.body;
-  HomeSliders.sliderFindById(id, (data) => {
-    res.status(200).json({ data });
-  });
+  if (!id) {
+    res.status(500).json({
+      error: "Need To Pass Id.",
+    });
+  } else {
+    HomeSliders.sliderFindById(id, (data) => {
+      res.status(200).json({ data });
+    });
+  }
 };
 
 const addSlider = (req, res, next) => {
-  const slider = new HomeSliders(req.body.url);
-  slider.save();
+  if (req.body.url == "") {
+    res.status(500).json({
+      error: "Need to fill all necessary fields.",
+    });
+  } else {
+    const slider = new HomeSliders(req.body.url);
+    slider.save();
 
-  res.status(201).json({
-    msg: "Slider added successfully!",
-  });
+    res.status(201).json({
+      msg: "Slider added successfully!",
+    });
+  }
 };
 
 const updateSlider = (req, res, next) => {
   const { id, url } = req.body;
-  const slider = new HomeSliders(url);
-  slider.id = id;
-  slider.save();
 
-  res.status(201).json({
-    msg: "Slider updated successfully!",
-  });
+  if (!id || !url) {
+    res.status(500).json({
+      error: "Need to fill all necessary fields.",
+    });
+  } else {
+    const slider = new HomeSliders(url);
+    slider.id = id;
+    slider.save();
+    res.status(201).json({
+      msg: "Slider updated successfully!",
+    });
+  }
 };
 
 const deleteSlider = (req, res, next) => {
   const { id } = req.body;
-  HomeSliders.deleteById(id, (err) => {
-    if (err) res.status(500).json({ error: "Can't delete" });
-    else res.status(200).json({ msg: "Deleted successfully!" });
-  });
+  if (!id) {
+    res.status(500).json({
+      error: "Need To Pass Id.",
+    });
+  } else {
+    HomeSliders.deleteById(id, (err) => {
+      if (err) res.status(500).json({ error: "Can't delete" });
+      else res.status(200).json({ msg: "Deleted successfully!" });
+    });
+  }
 };
 
 const getSliderText = (req, res, next) => {
@@ -54,12 +78,18 @@ const getSliderText = (req, res, next) => {
 };
 
 const addSliderText = (req, res, next) => {
-  const slider = new HomeSlidersText(req.body.text);
-  slider.save();
+  if (!req.body.text) {
+    res.status(500).json({
+      error: "Need to fill all necessary fields.",
+    });
+  } else {
+    const slider = new HomeSlidersText(req.body.text);
+    slider.save();
 
-  res.status(201).json({
-    msg: "Slider Text added successfully!",
-  });
+    res.status(201).json({
+      msg: "Slider Text added successfully!",
+    });
+  }
 };
 
 module.exports = {

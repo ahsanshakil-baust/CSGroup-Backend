@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const homeSliderRouter = require("./routes/homeSliderRouter");
+const adminRouter = require("./routes/adminRouter");
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/admin", homeSliderRouter);
+app.use("/admin", adminRouter);
 
 app.get("/", (req, res) => {
   res.json({ msg: "Working" });

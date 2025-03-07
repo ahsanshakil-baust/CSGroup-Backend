@@ -10,14 +10,15 @@ const {
   addSliderText,
   getSliderText,
 } = require("../controllers/homeSliderController");
+const authurization = require("../middlewares/authorization");
 
-router.get("/sliders", getAllSliderDetails);
-router.get("/slider-details", getSliderDetails);
-router.post("/add-slider", addSlider);
-router.post("/update-slider", updateSlider);
-router.post("/delete-slider", deleteSlider);
+router.get("/sliders", authurization, getAllSliderDetails);
+router.get("/slider-details", authurization, getSliderDetails);
+router.post("/add-slider", authurization, addSlider);
+router.post("/update-slider", authurization, updateSlider);
+router.post("/delete-slider", authurization, deleteSlider);
 
-router.get("/slider-text", getSliderText);
-router.post("/add-slider-text", addSliderText);
+router.get("/slider-text", authurization, getSliderText);
+router.post("/add-slider-text", authurization, addSliderText);
 
 module.exports = router;
