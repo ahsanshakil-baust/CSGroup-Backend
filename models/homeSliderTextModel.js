@@ -13,21 +13,17 @@ module.exports = class HomeSlidersText {
   save() {
     const updatedData = { text: this.text };
 
-    fs.writeFile(
-      homeSliderPath,
-      JSON.stringify(updatedData, null, 2),
-      (err) => {
-        if (err) {
-          console.error("Error saving homeSliderText:", err);
-        } else {
-          console.log("Text saved successfully!");
-        }
+    fs.writeFile(homeSliderPath, JSON.stringify(updatedData), (err) => {
+      if (err) {
+        console.error("Error saving homeSliderText:", err);
+      } else {
+        console.log("Text saved successfully!");
       }
-    );
+    });
   }
 
-  static getSliderText(callback) {
-    fs.readFile(homeSliderPath, "utf-8", (err, data) => {
+  static getText(callback) {
+    fs.readFile(homeSliderPath, (err, data) => {
       if (!err) {
         const parsedData = JSON.parse(data);
         callback(parsedData);

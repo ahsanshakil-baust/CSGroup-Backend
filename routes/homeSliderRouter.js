@@ -8,8 +8,8 @@ const {
   deleteSlider,
   getSliderDetails,
   addSliderText,
+  getSliderText,
 } = require("../controllers/homeSliderController");
-const { getSliderText } = require("../models/homeSliderTextModel");
 
 router.get("/sliders", getAllSliderDetails);
 router.get("/slider-details", getSliderDetails);

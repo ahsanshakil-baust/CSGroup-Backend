@@ -26,7 +26,7 @@ const addSlider = (req, res, next) => {
 };
 
 const updateSlider = (req, res, next) => {
-  const { id, url } = req.body.url;
+  const { id, url } = req.body;
   const slider = new HomeSliders(url);
   slider.id = id;
   slider.save();
@@ -45,12 +45,11 @@ const deleteSlider = (req, res, next) => {
 };
 
 const getSliderText = (req, res, next) => {
-  HomeSlidersText.getSliderText((data) => {
-    // if (!data || typeof data.text === "undefined") {
-    //   return res.status(404).json({ error: "No slider text found" });
-    // }
-    // res.status(200).json(data);
-    console.log(data);
+  HomeSlidersText.getText((data) => {
+    if (!data || typeof data.text === "undefined") {
+      return res.status(404).json({ error: "No slider text found" });
+    }
+    res.status(200).json(data);
   });
 };
 
