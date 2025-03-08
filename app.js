@@ -1,8 +1,11 @@
 require("dotenv").config();
 
 const express = require("express");
+const cors = require("cors");
+
 const homeSliderRouter = require("./routes/homeSliderRouter");
 const adminRouter = require("./routes/adminRouter");
+const clientRouter = require("./routes/clientRouter");
 
 const app = express();
 
@@ -10,13 +13,11 @@ const port = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
 
 app.use("/admin", homeSliderRouter);
 app.use("/admin", adminRouter);
-
-app.get("/", (req, res) => {
-  res.json({ msg: "Working" });
-});
+app.use("/", clientRouter);
 
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {
@@ -25,5 +26,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running...`);
 });

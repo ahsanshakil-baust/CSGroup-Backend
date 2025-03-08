@@ -64,7 +64,6 @@ const userLogin = async (req, res, next) => {
         password,
         existingUser.password
       );
-      console.log(isPasswordValid);
 
       if (isPasswordValid) {
         // Generate JWT token for successful login

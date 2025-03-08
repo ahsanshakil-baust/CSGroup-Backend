@@ -45,11 +45,15 @@ module.exports = class User {
   static getUserByEmail(email, callback) {
     User.getAllUser((user) => {
       const userFound = user.find((el) => el.email === email);
-      callback({
-        id: userFound.id,
-        name: userFound.name,
-        email: userFound.email,
-      });
+      if (userFound) {
+        callback({
+          id: userFound.id,
+          name: userFound.name,
+          email: userFound.email,
+        });
+      } else {
+        callback({ error: "No user Exist!" });
+      }
     });
   }
 
