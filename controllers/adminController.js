@@ -11,7 +11,7 @@ const getAllUser = (req, res, next) => {
 };
 
 const getUserByEmail = (req, res, next) => {
-  const { email } = req.body;
+  const { email } = req.user;
   if (!email) {
     res.status(500).json({
       error: "Need To Pass Email.",
@@ -51,6 +51,7 @@ const addUser = async (req, res, next) => {
 
 const userLogin = async (req, res, next) => {
   const { email, password } = req.body;
+  console.log(email, password);
 
   User.getAllUser(async (user) => {
     const existingUser = user.find((el) => el.email === email);
@@ -70,7 +71,14 @@ const userLogin = async (req, res, next) => {
         const token = jwt.sign(existingUser, jwtSecret, {
           expiresIn: "1d",
         });
-        res.json({ token });
+        res.json({
+          user: {
+            id: existingUser.id,
+            name: existingUser.name,
+            email: existingUser.email,
+          },
+          token,
+        });
       } else {
         res.status(400).send("Invalid Credentials");
       }
