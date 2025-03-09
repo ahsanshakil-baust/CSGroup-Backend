@@ -7,7 +7,7 @@ const {
   deleteSlider,
   addSliderText,
   getSliderDetails,
-} = require("../controllers/homeSliderController");
+} = require("../controllers/adminHomeSliderController");
 const authurization = require("../middlewares/authorization");
 
 router.get("/slider-details", authurization, getSliderDetails);

@@ -3,8 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-const homeSliderRouter = require("./routes/homeSliderRouter");
-const adminRouter = require("./routes/adminRouter");
+const adminHomeSliderRouter = require("./routes/adminHomeSliderRouter");
+const adminUserRouter = require("./routes/adminUserRouter");
+const adminHomeReviewRouter = require("./routes/adminHomeReviewRouter");
 const clientRouter = require("./routes/clientRouter");
 
 const app = express();
@@ -24,8 +25,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use("/admin", homeSliderRouter);
-app.use("/admin", adminRouter);
+app.use("/admin", adminHomeSliderRouter);
+app.use("/admin", adminUserRouter);
+app.use("/admin/client-review", adminHomeReviewRouter);
 app.use("/", clientRouter);
 
 // Global Error Handling Middleware

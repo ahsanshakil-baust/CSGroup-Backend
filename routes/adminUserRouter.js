@@ -4,7 +4,7 @@ const {
   getUserByEmail,
   addUser,
   userLogin,
-} = require("../controllers/adminController");
+} = require("../controllers/adminUserController");
 const authurization = require("../middlewares/authorization");
 const router = express.Router();
 

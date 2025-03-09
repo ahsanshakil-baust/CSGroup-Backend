@@ -4,7 +4,7 @@ const router = express.Router();
 const {
   getSliderText,
   getAllSliderDetails,
-} = require("../controllers/homeSliderController");
+} = require("../controllers/adminHomeSliderController");
 
 router.get("/slider-text", getSliderText);
 router.get("/sliders", getAllSliderDetails);
