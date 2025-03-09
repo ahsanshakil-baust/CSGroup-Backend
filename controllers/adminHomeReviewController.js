@@ -42,13 +42,15 @@ const getAllReviews = (req, res, next) => {
 };
 
 const getReview = (req, res, next) => {
-  const { id } = req.body;
+  const { id } = req.params;
+  const convertedId = Number(id);
+
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    HomeClientReview.reviewFindById(id, (data) => {
+    HomeClientReview.reviewFindById(convertedId, (data) => {
       res.status(200).json({ data });
     });
   }

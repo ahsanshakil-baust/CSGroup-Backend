@@ -51,7 +51,6 @@ const addUser = async (req, res, next) => {
 
 const userLogin = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email, password);
 
   User.getAllUser(async (user) => {
     const existingUser = user.find((el) => el.email === email);
