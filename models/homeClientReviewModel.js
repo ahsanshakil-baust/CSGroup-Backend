@@ -142,6 +142,7 @@ module.exports = class HomeClientReview {
                 url: row[2],
                 comment: row[3],
                 star: row[4],
+                video: row[5],
               }))
             : [];
           callback(reviews);
