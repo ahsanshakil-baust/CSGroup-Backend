@@ -76,12 +76,13 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class HomeClientReview {
-  constructor(name, url, comment, star, id = 0) {
+  constructor(name, url, comment, star, video, id = 0) {
     this.id = id;
     this.name = name;
     this.url = url;
     this.comment = comment;
     this.star = star;
+    this.video = video;
   }
 
   save() {
@@ -99,6 +100,7 @@ module.exports = class HomeClientReview {
         review.url,
         review.comment,
         review.star,
+        review.video,
       ]);
 
       sheets.spreadsheets.values.update(
@@ -166,6 +168,7 @@ module.exports = class HomeClientReview {
           review.url,
           review.comment,
           review.star,
+          review.video,
         ]);
 
         sheets.spreadsheets.values.update(

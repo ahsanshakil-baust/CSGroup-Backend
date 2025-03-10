@@ -1,13 +1,13 @@
 const HomeClientReview = require("../models/homeClientReviewModel");
 
 const addClientReview = (req, res, next) => {
-  const { name, url, comment, star } = req.body;
+  const { name, url, comment, star, video } = req.body;
   if (name == "" || url == "" || comment == "" || star == "") {
     res.status(500).json({
       error: "Need to fill all necessary fields.",
     });
   } else {
-    const review = new HomeClientReview(name, url, comment, star);
+    const review = new HomeClientReview(name, url, comment, star, video);
     review.save();
 
     res.status(201).json({
@@ -17,14 +17,14 @@ const addClientReview = (req, res, next) => {
 };
 
 const updateReview = (req, res, next) => {
-  const { id, name, url, comment, star } = req.body;
+  const { id, name, url, comment, star, video } = req.body;
 
   if (!id || !url || !name || !comment || !star) {
     res.status(500).json({
       error: "Need to fill all necessary fields.",
     });
   } else {
-    const review = new HomeClientReview(name, url, comment, star);
+    const review = new HomeClientReview(name, url, comment, star, video);
     review.id = id;
     review.save();
     res.status(201).json({
