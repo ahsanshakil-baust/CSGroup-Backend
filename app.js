@@ -7,6 +7,7 @@ const adminHomeSliderRouter = require("./routes/adminHomeSliderRouter");
 const adminUserRouter = require("./routes/adminUserRouter");
 const adminHomeReviewRouter = require("./routes/adminHomeReviewRouter");
 const clientRouter = require("./routes/clientRouter");
+const adsRouter = require("./routes/adsRouter");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(cors(corsOptions));
 app.use("/admin", adminHomeSliderRouter);
 app.use("/admin", adminUserRouter);
 app.use("/admin/client-review", adminHomeReviewRouter);
+app.use("/admin/ads", adsRouter);
 app.use("/", clientRouter);
 
 // Global Error Handling Middleware
