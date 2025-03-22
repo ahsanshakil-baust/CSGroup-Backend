@@ -26,6 +26,7 @@ app.use(cors());
 
 const allowedOrigins = [
     "http://localhost:3000",
+    "http://localhost:3001",
     "https://test.chirosobujgroup.com",
     "https://chirosobujgroup.com/",
 ];
