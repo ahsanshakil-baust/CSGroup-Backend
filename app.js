@@ -17,11 +17,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
+// const corsOptions = {
+//   origin: "http://localhost:3000",
+//   methods: "GET,POST,PUT,DELETE",
+//   allowedHeaders: "Content-Type,Authorization",
+//   credentials: true,
+// };
+
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://test.chirosobujgroup.com",
+    "https://chirosobujgroup.com/",
+];
+
 const corsOptions = {
-  origin: "http://localhost:3000",
-  methods: "GET,POST,PUT,DELETE",
-  allowedHeaders: "Content-Type,Authorization",
-  credentials: true,
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -34,10 +53,10 @@ app.use("/", clientRouter);
 
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Internal Server Error" });
+    console.error(err.stack);
+    res.status(500).json({ error: "Internal Server Error" });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running...`);
+    console.log(`Server is running...`);
 });
