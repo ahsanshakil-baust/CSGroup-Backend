@@ -69,8 +69,8 @@ module.exports = class FlatModel {
     async save() {
         FlatModel.getAllFlat((flats) => {
             if (this.id > 0) {
-                flats = flats.map((review) =>
-                    review.id === this.id ? this : review
+                flats = flats.map((flat) =>
+                    flat.id === this.id ? this : flat
                 );
             } else {
                 this.id = flats.length + 1;
@@ -142,7 +142,7 @@ module.exports = class FlatModel {
                     const rows = res.data.values;
                     const flat = rows
                         ? rows.map((row) => ({
-                              d: parseInt(row[0], 10),
+                              id: parseInt(row[0], 10),
                               flat_number: row[1],
                               floor: row[2],
                               address: row[3],
