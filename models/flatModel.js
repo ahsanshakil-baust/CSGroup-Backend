@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "1WtQh01SeRDPgvU2JL9ceJ1BmT0s2yImarXAI4g08pRI";
-const range = "Sheet1!A1:Y";
+const range = "Sheet1!A:Y";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -28,10 +28,10 @@ module.exports = class FlatModel {
         generator,
         cctv,
         security_guard,
-        // others_facilities = [],
-        // flat_images = [],
-        // feature_images = [],
-        // flat_videos = [],
+        others_facilities = [],
+        flat_images = [],
+        feature_images = [],
+        flat_videos = [],
         completion_status,
         project_id,
         land_details_id,
@@ -55,10 +55,10 @@ module.exports = class FlatModel {
         this.generator = generator;
         this.cctv = cctv;
         this.security_guard = security_guard;
-        // this.others_facilities = others_facilities;
-        // this.flat_images = flat_images;
-        // this.feature_images = feature_images;
-        // this.flat_videos = flat_videos;
+        this.others_facilities = others_facilities;
+        this.flat_images = flat_images;
+        this.feature_images = feature_images;
+        this.flat_videos = flat_videos;
         this.completion_status = completion_status;
         this.project_id = project_id;
         this.land_details_id = land_details_id;
@@ -67,24 +67,13 @@ module.exports = class FlatModel {
     }
 
     async save() {
-        try {
-            const flats = await FlatModel.getAllFlat();
-
+        FlatModel.getAllFlat((flats) => {
             if (this.id > 0) {
-                // Update an existing entry
-                for (let i = 0; i < flats.length; i++) {
-                    if (flats[i].id === this.id) {
-                        flats[i] = this;
-                        break;
-                    }
-                }
-            } else {
-                // Assign new ID based on max existing ID
-                const maxId = flats.reduce(
-                    (max, flat) => Math.max(max, flat.id),
-                    0
+                flats = flats.map((review) =>
+                    review.id === this.id ? this : review
                 );
-                this.id = maxId + 1;
+            } else {
+                this.id = flats.length + 1;
                 flats.push(this);
             }
 
@@ -105,10 +94,10 @@ module.exports = class FlatModel {
                 flat.generator,
                 flat.cctv,
                 flat.security_guard,
-                // JSON.stringify(flat.others_facilities),
-                // JSON.stringify(flat.flat_images),
-                // JSON.stringify(flat.feature_images),
-                // JSON.stringify(flat.flat_videos),
+                JSON.stringify(flat.others_facilities),
+                JSON.stringify(flat.flat_images),
+                JSON.stringify(flat.feature_images),
+                JSON.stringify(flat.flat_videos),
                 flat.completion_status,
                 flat.project_id,
                 flat.land_details_id,
@@ -116,65 +105,74 @@ module.exports = class FlatModel {
                 flat.status,
             ]);
 
-            await sheets.spreadsheets.values.update({
-                spreadsheetId: sheetId,
-                range: range,
-                valueInputOption: "RAW",
-                requestBody: { values: updatedData },
-            });
-
-            console.log("Data saved successfully to Google Sheets!");
-        } catch (err) {
-            console.error("Error saving data to Google Sheets:", err);
-        }
+            sheets.spreadsheets.values.update(
+                {
+                    spreadsheetId: sheetId,
+                    range: range,
+                    valueInputOption: "RAW",
+                    requestBody: { values: updatedData },
+                },
+                (err, res) => {
+                    if (err) {
+                        console.error(
+                            "Error saving data to Google Sheets:",
+                            err
+                        );
+                    } else {
+                        console.log(
+                            "Data saved successfully to Google Sheets!"
+                        );
+                    }
+                }
+            );
+        });
     }
 
-    static async getAllFlat() {
-        try {
-            const res = await sheets.spreadsheets.values.get({
+    static async getAllFlat(callback) {
+        sheets.spreadsheets.values.get(
+            {
                 spreadsheetId: sheetId,
                 range: range,
-            });
-
-            const rows = res.data.values || [];
-            console.log(rows);
-
-            return rows.map((row) => ({
-                id: parseInt(row[0], 10),
-                flat_number: row[1],
-                floor: row[2],
-                address: row[3],
-                direction: row[4],
-                bedrooms: row[5],
-                drawing: row[6],
-                dining: row[7],
-                bathrooms: row[8],
-                balconies: row[9],
-                kitchen: row[10],
-                lift: row[11],
-                stair: row[12],
-                generator: row[13],
-                cctv: row[14],
-                security_guard: row[15],
-                // others_facilities: JSON.parse(row[16] || "[]"),
-                // flat_images: JSON.parse(row[17] || "[]"),
-                // feature_images: JSON.parse(row[18] || "[]"),
-                // flat_videos: JSON.parse(row[19] || "[]"),
-                // completion_status: row[20],
-                // project_id: row[21],
-                // land_details_id: row[22],
-                // owner_id: row[23],
-                // status: parseInt(row[24], 10),
-                completion_status: row[16],
-                project_id: row[17],
-                land_details_id: row[18],
-                owner_id: row[19],
-                status: parseInt(row[20], 10),
-            }));
-        } catch (err) {
-            console.error("Error reading from Google Sheets:", err);
-            return [];
-        }
+            },
+            (err, res) => {
+                if (err) {
+                    console.error("Error reading from Google Sheets:", err);
+                    callback([]);
+                } else {
+                    const rows = res.data.values;
+                    const flat = rows
+                        ? rows.map((row) => ({
+                              d: parseInt(row[0], 10),
+                              flat_number: row[1],
+                              floor: row[2],
+                              address: row[3],
+                              direction: row[4],
+                              bedrooms: row[5],
+                              drawing: row[6],
+                              dining: row[7],
+                              bathrooms: row[8],
+                              balconies: row[9],
+                              kitchen: row[10],
+                              lift: row[11],
+                              stair: row[12],
+                              generator: row[13],
+                              cctv: row[14],
+                              security_guard: row[15],
+                              others_facilities: JSON.parse(row[16] || "[]"),
+                              flat_images: JSON.parse(row[17] || "[]"),
+                              feature_images: JSON.parse(row[18] || "[]"),
+                              flat_videos: JSON.parse(row[19] || "[]"),
+                              completion_status: row[20],
+                              project_id: row[21],
+                              land_details_id: row[22],
+                              owner_id: row[23],
+                              status: parseInt(row[24], 10),
+                          }))
+                        : [];
+                    callback(flat);
+                }
+            }
+        );
     }
 
     static async flatFindById(id) {
