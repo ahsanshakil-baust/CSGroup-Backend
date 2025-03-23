@@ -3,11 +3,10 @@ const HomeSlidersTextBn = require("../models/homeSliderTextBnModel");
 const HomeSlidersText = require("../models/homeSliderTextModel");
 
 const getAllSliderDetails = (req, res, next) => {
-    HomeSliders.getAllSlider((data) =>
-        res.status(200).json({
-            data,
-        })
-    );
+    HomeSliders.getAllSlider((data) => {
+        const newData = data.filter((el) => el.status != 0);
+        res.status(200).json({ data: newData });
+    });
 };
 
 const getSliderDetails = (req, res, next) => {
@@ -18,7 +17,8 @@ const getSliderDetails = (req, res, next) => {
         });
     } else {
         HomeSliders.sliderFindById(id, (data) => {
-            res.status(200).json({ data });
+            const newData = data.filter((el) => el.status != 0);
+            res.status(200).json({ newData });
         });
     }
 };
@@ -72,7 +72,7 @@ const deleteSlider = (req, res, next) => {
         slider.status = 0;
         slider.save();
         res.status(201).json({
-            msg: "Slider updated successfully!",
+            msg: "Slider deleted successfully!",
         });
     }
 };

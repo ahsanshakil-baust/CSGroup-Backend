@@ -136,7 +136,7 @@ module.exports = class HomeSliders {
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
                               url: row[1],
-                              status: row[2],
+                              status: parseInt(row[2]),
                           }))
                         : [];
                     callback(sliders);

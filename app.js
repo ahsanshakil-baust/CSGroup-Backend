@@ -8,6 +8,7 @@ const adminUserRouter = require("./routes/adminUserRouter");
 const adminHomeReviewRouter = require("./routes/adminHomeReviewRouter");
 const clientRouter = require("./routes/clientRouter");
 const adsRouter = require("./routes/adsRouter");
+const flatRouter = require("./routes/flatRouter");
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/admin", adminHomeSliderRouter);
 app.use("/admin", adminUserRouter);
 app.use("/admin/client-review", adminHomeReviewRouter);
 app.use("/admin/ads", adsRouter);
+app.use("/flat", flatRouter);
 app.use("/", clientRouter);
 
 // Global Error Handling Middleware
