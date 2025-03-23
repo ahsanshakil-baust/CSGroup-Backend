@@ -23,6 +23,7 @@ const getFlatDetails = (req, res, next) => {
 
 const addFlat = (req, res, next) => {
     const {
+        type,
         flat_number,
         floor,
         address,
@@ -48,6 +49,7 @@ const addFlat = (req, res, next) => {
         owner_id,
     } = req.body;
     if (
+        !type &&
         !flat_number &&
         !floor &&
         !address &&
@@ -60,6 +62,7 @@ const addFlat = (req, res, next) => {
         });
     } else {
         const flat = new FlatModel(
+            type,
             flat_number,
             floor,
             address,
@@ -96,6 +99,7 @@ const addFlat = (req, res, next) => {
 const updateFlat = (req, res, next) => {
     const {
         id,
+        type,
         flat_number,
         floor,
         address,
@@ -127,6 +131,7 @@ const updateFlat = (req, res, next) => {
         });
     } else {
         const flat = new FlatModel(
+            type,
             flat_number,
             floor,
             address,

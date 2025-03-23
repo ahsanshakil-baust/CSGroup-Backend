@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "1WtQh01SeRDPgvU2JL9ceJ1BmT0s2yImarXAI4g08pRI";
-const range = "Sheet1!A:Y";
+const range = "Sheet1!A:Z";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -13,6 +13,7 @@ const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class FlatModel {
     constructor(
+        type,
         flat_number,
         floor,
         address,
@@ -40,6 +41,7 @@ module.exports = class FlatModel {
         id = 0
     ) {
         this.id = id;
+        this.type = type;
         this.flat_number = flat_number;
         this.floor = floor;
         this.address = address;
@@ -79,6 +81,7 @@ module.exports = class FlatModel {
 
             const updatedData = flats.map((flat) => [
                 flat.id,
+                flat.type,
                 flat.flat_number,
                 flat.floor,
                 flat.address,
@@ -143,30 +146,31 @@ module.exports = class FlatModel {
                     const flat = rows
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
-                              flat_number: row[1],
-                              floor: row[2],
-                              address: row[3],
-                              direction: row[4],
-                              bedrooms: row[5],
-                              drawing: row[6],
-                              dining: row[7],
-                              bathrooms: row[8],
-                              balconies: row[9],
-                              kitchen: row[10],
-                              lift: row[11],
-                              stair: row[12],
-                              generator: row[13],
-                              cctv: row[14],
-                              security_guard: row[15],
-                              others_facilities: JSON.parse(row[16] || "[]"),
-                              flat_images: JSON.parse(row[17] || "[]"),
-                              feature_images: JSON.parse(row[18] || "[]"),
-                              flat_videos: JSON.parse(row[19] || "[]"),
-                              completion_status: row[20],
-                              project_id: row[21],
-                              land_details_id: row[22],
-                              owner_id: row[23],
-                              status: parseInt(row[24], 10),
+                              type: row[1],
+                              flat_number: row[2],
+                              floor: row[3],
+                              address: row[4],
+                              direction: row[5],
+                              bedrooms: row[6],
+                              drawing: row[7],
+                              dining: row[8],
+                              bathrooms: row[9],
+                              balconies: row[10],
+                              kitchen: row[11],
+                              lift: row[12],
+                              stair: row[13],
+                              generator: row[14],
+                              cctv: row[15],
+                              security_guard: row[16],
+                              others_facilities: JSON.parse(row[17] || "[]"),
+                              flat_images: JSON.parse(row[18] || "[]"),
+                              feature_images: JSON.parse(row[19] || "[]"),
+                              flat_videos: JSON.parse(row[20] || "[]"),
+                              completion_status: row[21],
+                              project_id: row[22],
+                              land_details_id: row[23],
+                              owner_id: row[24],
+                              status: parseInt(row[25], 10),
                           }))
                         : [];
                     callback(flat);

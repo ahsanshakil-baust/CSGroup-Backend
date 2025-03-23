@@ -1,8 +1,8 @@
 const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
-const sheetId = "15tL2aXEHssjjUF4MwwrmK6EaSviKfq28Pq_TWKn4sjc";
-const range = "Sheet1!A:C";
+const sheetId = "1Jzzz3TXHS-jmeFXmXRVICrebdwy7y4VBLAiLyslZrDQ";
+const range = "Sheet1!A:H";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -11,28 +11,47 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 
-module.exports = class ProjectModel {
-    constructor(name, id = 0, status = 1) {
+module.exports = class OwnerModel {
+    constructor(
+        name,
+        image,
+        occupation,
+        blood_group,
+        p_address,
+        mobile,
+        id = 0,
+        status = 1
+    ) {
         this.id = id;
         this.name = name;
+        this.image = image;
+        this.occupation = occupation;
+        this.blood_group = blood_group;
+        this.p_address = p_address;
+        this.mobile = mobile;
         this.status = status;
     }
 
     save() {
-        ProjectModel.getAllProjects((projects) => {
+        OwnerModel.getAllOwners((owners) => {
             if (this.id > 0) {
-                projects = projects.map((project) =>
-                    project.id == this.id ? this : project
+                owners = owners.map((owner) =>
+                    owner.id == this.id ? this : owner
                 );
             } else {
-                this.id = projects.length + 1;
-                projects.push(this);
+                this.id = owners.length + 1;
+                owners.push(this);
             }
 
-            const updatedData = projects.map((project) => [
-                project.id,
-                project.name,
-                project.status,
+            const updatedData = owners.map((owner) => [
+                owner.id,
+                owner.name,
+                owner.image,
+                owner.occupation,
+                owner.blood_group,
+                owner.p_address,
+                owner.mobile,
+                owner.status,
             ]);
 
             sheets.spreadsheets.values.update(
@@ -58,7 +77,7 @@ module.exports = class ProjectModel {
         });
     }
 
-    static getAllProjects(callback) {
+    static getAllOwners(callback) {
         sheets.spreadsheets.values.get(
             {
                 spreadsheetId: sheetId,
@@ -70,22 +89,27 @@ module.exports = class ProjectModel {
                     callback([]);
                 } else {
                     const rows = res.data.values;
-                    const project = rows
+                    const owner = rows
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
                               name: row[1],
-                              status: parseInt(row[2]),
+                              image: row[2],
+                              occupation: row[3],
+                              blood_group: row[4],
+                              p_address: row[5],
+                              mobile: row[6],
+                              status: parseInt(row[7], 10),
                           }))
                         : [];
 
-                    callback(project);
+                    callback(owner);
                 }
             }
         );
     }
 
-    static async projectFindById(id) {
-        const flats = await ProjectModel.getAllProjects();
-        return flats.find((project) => project.id === id) || null;
+    static async ownerFindById(id) {
+        const owners = await OwnerModel.getAllOwners();
+        return owners.find((owner) => owner.id === id) || null;
     }
 };
