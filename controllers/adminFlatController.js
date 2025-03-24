@@ -54,7 +54,24 @@ const getAllFlats = async (req, res, next) => {
                 )
             );
 
-            res.status(200).json({ data: updatedFlats });
+            const updatedFlatsWithProject = await Promise.all(
+                updatedFlats.map(
+                    (el) =>
+                        new Promise((resolve) => {
+                            ProjectModel.projectFindById(
+                                parseInt(el.land_details_id),
+                                (project) => {
+                                    resolve({
+                                        ...el,
+                                        project_name: project.name || "",
+                                    });
+                                }
+                            );
+                        })
+                )
+            );
+
+            res.status(200).json({ data: updatedFlatsWithProject });
         });
     } catch (error) {
         next(error);
