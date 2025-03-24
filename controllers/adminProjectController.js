@@ -8,15 +8,16 @@ const getAllProject = (req, res, next) => {
 };
 
 const getProject = (req, res, next) => {
-    const { id } = req.body;
+    const { id } = req.params;
+
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        ProjectModel.projectFindById(id, (data) => {
-            const newData = data.filter((el) => el.status != 0);
-            res.status(200).json({ newData });
+        ProjectModel.projectFindById(parseInt(id), (data) => {
+            const newData = data;
+            res.status(200).json({ data: newData });
         });
     }
 };

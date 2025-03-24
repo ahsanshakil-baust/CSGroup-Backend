@@ -10,11 +10,17 @@ const {
     getFlatDetails,
     getAllFlats,
 } = require("../controllers/adminFlatController");
+const {
+    getAllProject,
+    getProject,
+} = require("../controllers/adminProjectController");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
 router.get("/sliders", getAllSliderDetails);
 router.get("/all-flat", getAllFlats);
 router.get("/flat", getFlatDetails);
+router.get("/project/all", getAllProject);
+router.get("/project/:id", getProject);
 
 module.exports = router;

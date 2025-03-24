@@ -54,10 +54,10 @@ app.use("/admin", adminHomeSliderRouter);
 app.use("/admin", adminUserRouter);
 app.use("/admin/client-review", adminHomeReviewRouter);
 app.use("/admin/ads", adsRouter);
-app.use("/flat", flatRouter);
-app.use("/project", projectRouter);
-app.use("/owner", ownerRouter);
-app.use("/land-details", landRouter);
+app.use("/admin/flat", flatRouter);
+app.use("/admin/project", projectRouter);
+app.use("/admin/owner", ownerRouter);
+app.use("/admin/land-details", landRouter);
 app.use("/", clientRouter);
 
 // Global Error Handling Middleware
