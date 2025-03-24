@@ -22,7 +22,7 @@ const getOwner = (req, res, next) => {
 };
 
 const addOwner = (req, res, next) => {
-    const { name, image, occupation, blood_group, p_address, mobile } =
+    const { name, image, occupation, blood_group, p_address, mobile, flat_id } =
         req.body;
     if (name == "") {
         res.status(500).json({
@@ -35,7 +35,8 @@ const addOwner = (req, res, next) => {
             occupation,
             blood_group,
             p_address,
-            mobile
+            mobile,
+            flat_id
         );
         owner.save();
 
@@ -46,8 +47,16 @@ const addOwner = (req, res, next) => {
 };
 
 const updateOwner = (req, res, next) => {
-    const { id, name, image, occupation, blood_group, p_address, mobile } =
-        req.body;
+    const {
+        id,
+        name,
+        image,
+        occupation,
+        blood_group,
+        p_address,
+        mobile,
+        flat_id,
+    } = req.body;
 
     if (!id || !name) {
         res.status(500).json({
@@ -60,7 +69,8 @@ const updateOwner = (req, res, next) => {
             occupation,
             blood_group,
             p_address,
-            mobile
+            mobile,
+            flat_id
         );
         owner.id = id;
         owner.save();

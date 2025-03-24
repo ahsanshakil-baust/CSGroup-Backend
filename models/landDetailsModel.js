@@ -23,7 +23,6 @@ module.exports = class LandDetailsModel {
         khariz_cost,
         other_cost,
         total_price,
-        flat_id,
         project_id,
         id = 0,
         status = 1
@@ -39,18 +38,21 @@ module.exports = class LandDetailsModel {
         this.khariz_cost = khariz_cost;
         this.other_cost = other_cost;
         this.total_price = total_price;
-        this.flat_id = flat_id;
         this.project_id = project_id;
         this.status = status;
     }
 
-    save() {
+    save(callback) {
         LandDetailsModel.getAllLandDetails((lands) => {
             if (this.id > 0) {
                 lands = lands.map((land) => (land.id == this.id ? this : land));
             } else {
                 this.id = lands.length + 1;
                 lands.push(this);
+                callback({
+                    id: this.id,
+                    project_id: parseInt(this.project_id),
+                });
             }
 
             const updatedData = lands.map((land) => [
@@ -65,7 +67,6 @@ module.exports = class LandDetailsModel {
                 land.khariz_cost,
                 land.other_cost,
                 land.total_price,
-                land.flat_id,
                 land.project_id,
                 land.status,
             ]);
@@ -118,9 +119,8 @@ module.exports = class LandDetailsModel {
                               khariz_cost: row[8],
                               other_cost: row[9],
                               total_price: row[10],
-                              flat_id: row[11],
-                              project_id: row[12],
-                              status: parseInt(row[13], 10),
+                              project_id: row[11],
+                              status: parseInt(row[12], 10),
                           }))
                         : [];
 
@@ -136,8 +136,7 @@ module.exports = class LandDetailsModel {
                 lands.find(
                     (land) =>
                         parseInt(land.id) === id &&
-                        parseInt(land.project_id) === project_id &&
-                        parseInt(land.flat_id) === flat_id
+                        parseInt(land.project_id) === project_id
                 ) || null;
 
             callback(land);

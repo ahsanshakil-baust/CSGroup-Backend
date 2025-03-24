@@ -19,6 +19,7 @@ module.exports = class OwnerModel {
         blood_group,
         p_address,
         mobile,
+        flat_id,
         id = 0,
         status = 1
     ) {
@@ -29,6 +30,7 @@ module.exports = class OwnerModel {
         this.blood_group = blood_group;
         this.p_address = p_address;
         this.mobile = mobile;
+        this.flat_id = flat_id;
         this.status = status;
     }
 
@@ -51,6 +53,7 @@ module.exports = class OwnerModel {
                 owner.blood_group,
                 owner.p_address,
                 owner.mobile,
+                owner.flat_id,
                 owner.status,
             ]);
 
@@ -98,7 +101,8 @@ module.exports = class OwnerModel {
                               blood_group: row[4],
                               p_address: row[5],
                               mobile: row[6],
-                              status: parseInt(row[7], 10),
+                              flat_id: row[7],
+                              status: parseInt(row[8], 10),
                           }))
                         : [];
 

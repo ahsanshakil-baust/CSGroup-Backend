@@ -8,13 +8,13 @@ const getAllLandDetails = (req, res, next) => {
 };
 
 const getLandDetails = (req, res, next) => {
-    const { id, project_id, flat_id } = req.body;
+    const { id, project_id } = req.body;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        LandDetailsModel.landFindById({ id, project_id, flat_id }, (data) => {
+        LandDetailsModel.landFindById({ id, project_id }, (data) => {
             const newData = data.filter((el) => el.status != 0);
             res.status(200).json({ newData });
         });
@@ -33,7 +33,6 @@ const addLandDetails = (req, res, next) => {
         khariz_cost,
         other_cost,
         total_price,
-        flat_id,
         project_id,
     } = req.body;
 
@@ -53,14 +52,13 @@ const addLandDetails = (req, res, next) => {
             khariz_cost,
             other_cost,
             total_price,
-            flat_id,
             project_id
         );
 
-        landDetails.save();
-
-        res.status(201).json({
-            msg: "Land Details added successfully!",
+        landDetails.save((data) => {
+            res.status(201).json({
+                data,
+            });
         });
     }
 };
@@ -78,7 +76,6 @@ const updateLandDetails = (req, res, next) => {
         khariz_cost,
         other_cost,
         total_price,
-        flat_id,
         project_id,
     } = req.body;
 
@@ -98,7 +95,6 @@ const updateLandDetails = (req, res, next) => {
             khariz_cost,
             other_cost,
             total_price,
-            flat_id,
             project_id
         );
         land.id = id;

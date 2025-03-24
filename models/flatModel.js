@@ -36,7 +36,6 @@ module.exports = class FlatModel {
         completion_status,
         project_id,
         land_details_id,
-        owner_id,
         status = 1,
         id = 0
     ) {
@@ -64,11 +63,10 @@ module.exports = class FlatModel {
         this.completion_status = completion_status;
         this.project_id = project_id;
         this.land_details_id = land_details_id;
-        this.owner_id = owner_id;
         this.status = status;
     }
 
-    async save() {
+    async save(callback) {
         FlatModel.getAllFlat((flats) => {
             if (this.id > 0) {
                 flats = flats.map((flat) =>
@@ -77,6 +75,7 @@ module.exports = class FlatModel {
             } else {
                 this.id = flats.length + 1;
                 flats.push(this);
+                callback({ id: this.id });
             }
 
             const updatedData = flats.map((flat) => [
@@ -104,7 +103,6 @@ module.exports = class FlatModel {
                 flat.completion_status,
                 flat.project_id,
                 flat.land_details_id,
-                flat.owner_id,
                 flat.status,
             ]);
 
@@ -169,8 +167,7 @@ module.exports = class FlatModel {
                               completion_status: row[21],
                               project_id: row[22],
                               land_details_id: row[23],
-                              owner_id: row[24],
-                              status: parseInt(row[25]),
+                              status: parseInt(row[24]),
                           }))
                         : [];
                     callback(flat);

@@ -80,7 +80,6 @@ const addFlat = (req, res, next) => {
         completion_status,
         project_id,
         land_details_id,
-        owner_id,
     } = req.body;
     if (
         !type &&
@@ -118,14 +117,13 @@ const addFlat = (req, res, next) => {
             flat_videos,
             completion_status,
             project_id,
-            land_details_id,
-            owner_id
+            land_details_id
         );
 
-        flat.save();
-
-        res.status(201).json({
-            msg: "Flat added successfully!",
+        flat.save((data) => {
+            res.status(201).json({
+                data,
+            });
         });
     }
 };
@@ -156,7 +154,6 @@ const updateFlat = (req, res, next) => {
         completion_status,
         project_id,
         land_details_id,
-        owner_id,
     } = req.body;
 
     if (!id) {
@@ -187,8 +184,7 @@ const updateFlat = (req, res, next) => {
             flat_videos,
             completion_status,
             project_id,
-            land_details_id,
-            owner_id
+            land_details_id
         );
         flat.id = id;
         flat.save();
