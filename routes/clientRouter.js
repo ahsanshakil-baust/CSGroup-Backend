@@ -18,7 +18,7 @@ const {
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
 router.get("/sliders", getAllSliderDetails);
-router.get("/all-flat", getAllFlats);
+router.get("/flat/all", getAllFlats);
 router.get("/flat", getFlatDetails);
 router.get("/project/all", getAllProject);
 router.get("/project/:id", getProject);

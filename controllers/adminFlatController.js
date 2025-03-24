@@ -3,11 +3,62 @@ const OwnerModel = require("../models/flatOwnerModel");
 const LandDetailsModel = require("../models/landDetailsModel");
 const ProjectModel = require("../models/projectModel");
 
-const getAllFlats = (req, res, next) => {
-    FlatModel.getAllFlat((data) => {
-        const newData = data.filter((el) => el.status != 0);
-        res.status(200).json({ data: newData });
-    });
+// const getAllFlats = (req, res, next) => {
+//     FlatModel.getAllFlat((data) => {
+//         const newData = data.filter((el) => el.status != 0);
+
+//         newData.map((el) => {
+//             LandDetailsModel.landFindById(
+//                 parseInt(el.land_details_id),
+//                 parseInt(el.project_id),
+//                 (data) => {
+//                     // console.log(data);
+
+//                     // res.status(200).json({
+//                     //     data: {
+//                     //         ...newData,
+//                     //         land_details: data ? data : {},
+//                     //     },
+//                     // });
+//                     data, el;
+//                 }
+//             );
+//         });
+
+//         res.status(200).json({
+//             data: newData,
+//         });
+//     });
+// };
+
+const getAllFlats = async (req, res, next) => {
+    try {
+        FlatModel.getAllFlat(async (flats) => {
+            const newData = flats.filter((el) => el.status !== 0);
+
+            const updatedFlats = await Promise.all(
+                newData.map(
+                    (el) =>
+                        new Promise((resolve) => {
+                            LandDetailsModel.landFindById(
+                                parseInt(el.land_details_id),
+                                parseInt(el.project_id),
+                                (landData) => {
+                                    resolve({
+                                        ...el,
+                                        land_details: landData || {},
+                                    });
+                                }
+                            );
+                        })
+                )
+            );
+
+            res.status(200).json({ data: updatedFlats });
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 const getFlatDetails = (req, res, next) => {
@@ -80,6 +131,7 @@ const addFlat = (req, res, next) => {
         completion_status,
         project_id,
         land_details_id,
+        city,
     } = req.body;
     if (
         !type &&
@@ -117,7 +169,8 @@ const addFlat = (req, res, next) => {
             flat_videos,
             completion_status,
             project_id,
-            land_details_id
+            land_details_id,
+            city
         );
 
         flat.save((data) => {
@@ -154,6 +207,7 @@ const updateFlat = (req, res, next) => {
         completion_status,
         project_id,
         land_details_id,
+        city,
     } = req.body;
 
     if (!id) {
@@ -184,7 +238,8 @@ const updateFlat = (req, res, next) => {
             flat_videos,
             completion_status,
             project_id,
-            land_details_id
+            land_details_id,
+            city
         );
         flat.id = id;
         flat.save();

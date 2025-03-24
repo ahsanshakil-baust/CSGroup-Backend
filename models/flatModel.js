@@ -36,6 +36,7 @@ module.exports = class FlatModel {
         completion_status,
         project_id,
         land_details_id,
+        city,
         status = 1,
         id = 0
     ) {
@@ -63,6 +64,7 @@ module.exports = class FlatModel {
         this.completion_status = completion_status;
         this.project_id = project_id;
         this.land_details_id = land_details_id;
+        this.city = city;
         this.status = status;
     }
 
@@ -103,6 +105,7 @@ module.exports = class FlatModel {
                 flat.completion_status,
                 flat.project_id,
                 flat.land_details_id,
+                flat.city,
                 flat.status,
             ]);
 
@@ -167,7 +170,8 @@ module.exports = class FlatModel {
                               completion_status: row[21],
                               project_id: row[22],
                               land_details_id: row[23],
-                              status: parseInt(row[24]),
+                              city: row[24],
+                              status: parseInt(row[25]),
                           }))
                         : [];
                     callback(flat);

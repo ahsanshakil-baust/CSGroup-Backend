@@ -130,7 +130,7 @@ module.exports = class LandDetailsModel {
         );
     }
 
-    static async landFindById(id, project_id, flat_id, callback) {
+    static async landFindById(id, project_id, callback) {
         LandDetailsModel.getAllLandDetails((lands) => {
             const land =
                 lands.find(
