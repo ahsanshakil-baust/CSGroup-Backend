@@ -79,13 +79,13 @@ const getAllFlats = async (req, res, next) => {
 };
 
 const getFlatDetails = (req, res, next) => {
-    const { id } = req.body;
+    const { id } = req.params;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        FlatModel.flatFindById(id, (data) => {
+        FlatModel.flatFindById(parseInt(id), (data) => {
             let newData = data;
 
             OwnerModel.ownerFindById(parseInt(newData.owner_id), (data) => {
@@ -99,7 +99,6 @@ const getFlatDetails = (req, res, next) => {
                 LandDetailsModel.landFindById(
                     parseInt(newData.land_details_id),
                     parseInt(newData.project_id),
-                    parseInt(newData.id),
                     (data) => {
                         newData = {
                             ...newData,
@@ -122,6 +121,54 @@ const getFlatDetails = (req, res, next) => {
         });
     }
 };
+
+// const getFlatDetails = async (req, res, next) => {
+//     try {
+//         const { id } = req.params;
+//         console.log(id);
+
+//         if (!id) {
+//             return res.status(400).json({ error: "Need to pass ID." });
+//         }
+
+//         // Fetch Flat Details
+//         const flatData = await FlatModel.flatFindById(parseInt(id));
+//         if (!flatData) {
+//             return res.status(404).json({ error: "Flat not found." });
+//         }
+
+//         // Fetch Owner Details
+//         const ownerData = await OwnerModel.ownerFindById(
+//             parseInt(flatData.owner_id)
+//         );
+//         if (ownerData) {
+//             flatData.owner_details = ownerData;
+//         }
+
+//         // Fetch Land Details
+//         const landDetails = await LandDetailsModel.landFindById(
+//             parseInt(flatData.land_details_id),
+//             parseInt(flatData.project_id),
+//             parseInt(flatData.id)
+//         );
+//         if (landDetails) {
+//             flatData.land_details = landDetails;
+//         }
+
+//         // Fetch Project Details
+//         const projectDetails = await ProjectModel.projectFindById(
+//             parseInt(flatData.project_id)
+//         );
+//         if (projectDetails) {
+//             flatData.project_details = projectDetails;
+//         }
+
+//         res.status(200).json({ data: flatData });
+//     } catch (error) {
+//         console.error("Error fetching flat details:", error);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
 
 const addFlat = (req, res, next) => {
     const {

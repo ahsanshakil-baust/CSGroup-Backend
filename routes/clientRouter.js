@@ -19,7 +19,7 @@ router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
 router.get("/sliders", getAllSliderDetails);
 router.get("/flat/all", getAllFlats);
-router.get("/flat", getFlatDetails);
+router.get("/flat/:id", getFlatDetails);
 router.get("/project/all", getAllProject);
 router.get("/project/:id", getProject);
 
