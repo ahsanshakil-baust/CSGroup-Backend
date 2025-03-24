@@ -108,8 +108,10 @@ module.exports = class OwnerModel {
         );
     }
 
-    static async ownerFindById(id) {
-        const owners = await OwnerModel.getAllOwners();
-        return owners.find((owner) => owner.id === id) || null;
+    static async ownerFindById(id, calback) {
+        OwnerModel.getAllOwners((owners) => {
+            const owner = owners.find((owner) => owner.id === id) || null;
+            calback(owner);
+        });
     }
 };

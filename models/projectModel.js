@@ -84,8 +84,10 @@ module.exports = class ProjectModel {
         );
     }
 
-    static async projectFindById(id) {
-        const flats = await ProjectModel.getAllProjects();
-        return flats.find((project) => project.id === id) || null;
+    static async projectFindById(id, callback) {
+        ProjectModel.getAllProjects((flats) => {
+            const flat = flats.find((project) => project.id === id) || null;
+            callback(flat);
+        });
     }
 };

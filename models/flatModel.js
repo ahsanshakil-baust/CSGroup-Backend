@@ -170,7 +170,7 @@ module.exports = class FlatModel {
                               project_id: row[22],
                               land_details_id: row[23],
                               owner_id: row[24],
-                              status: parseInt(row[25], 10),
+                              status: parseInt(row[25]),
                           }))
                         : [];
                     callback(flat);
@@ -179,8 +179,10 @@ module.exports = class FlatModel {
         );
     }
 
-    static async flatFindById(id) {
-        const flats = await FlatModel.getAllFlat();
-        return flats.find((flat) => flat.id === id) || null;
+    static async flatFindById(id, callback) {
+        FlatModel.getAllFlat((flats) => {
+            const flat = flats.find((flat) => flat.id === id) || null;
+            callback(flat);
+        });
     }
 };

@@ -15,8 +15,8 @@ const getOwner = (req, res, next) => {
         });
     } else {
         OwnerModel.ownerFindById(id, (data) => {
-            const newData = data.filter((el) => el.status != 0);
-            res.status(200).json({ newData });
+            const newData = data;
+            res.status(200).json({ data: newData });
         });
     }
 };
