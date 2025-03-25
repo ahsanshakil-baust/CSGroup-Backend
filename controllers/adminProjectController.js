@@ -46,11 +46,11 @@ const addProject = (req, res, next) => {
             project_images,
             map_url
         );
-        project.save();
-
-        res.status(201).json({
-            msg: "Project added successfully!",
-        });
+        project.save((id) =>
+            res.status(201).json({
+                id,
+            })
+        );
     }
 };
 
@@ -81,10 +81,11 @@ const updateProject = (req, res, next) => {
             map_url
         );
         project.id = id;
-        project.save();
-        res.status(201).json({
-            msg: "Project updated successfully!",
-        });
+        project.save((id) =>
+            res.status(201).json({
+                id,
+            })
+        );
     }
 };
 

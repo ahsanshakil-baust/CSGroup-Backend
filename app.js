@@ -14,6 +14,7 @@ const ownerRouter = require("./routes/adminOwnerRouter");
 const landRouter = require("./routes/adminLandDetailsRouter");
 const projectLandRouter = require("./routes/adminProjectLandRouter");
 const projectFacilitiesRouter = require("./routes/adminProjectFacilitiesRouter");
+const projectOverviewRouter = require("./routes/adminProjectOverviewRouter");
 
 const app = express();
 
@@ -60,8 +61,9 @@ app.use("/admin/flat", flatRouter);
 app.use("/admin/project", projectRouter);
 app.use("/admin/owner", ownerRouter);
 app.use("/admin/land-details", landRouter);
-app.use("/admin/project-land", projectLandRouter);
+app.use("/admin/project-land-details", projectLandRouter);
 app.use("/admin/project-facilities", projectFacilitiesRouter);
+app.use("/admin/project-overview", projectOverviewRouter);
 app.use("/", clientRouter);
 
 // Global Error Handling Middleware
