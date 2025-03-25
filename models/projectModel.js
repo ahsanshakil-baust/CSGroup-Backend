@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "15tL2aXEHssjjUF4MwwrmK6EaSviKfq28Pq_TWKn4sjc";
-const range = "Sheet1!A:C";
+const range = "Sheet1!A:H";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -12,9 +12,25 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class ProjectModel {
-    constructor(name, id = 0, status = 1) {
+    constructor(
+        name,
+        project_type,
+        location,
+        description,
+        land_videos = [],
+        project_images = [],
+        map_url,
+        id = 0,
+        status = 1
+    ) {
         this.id = id;
         this.name = name;
+        this.project_type = project_type;
+        this.location = location;
+        this.description = description;
+        this.land_videos = land_videos;
+        this.project_images = project_images;
+        this.map_url = map_url;
         this.status = status;
     }
 
@@ -32,6 +48,12 @@ module.exports = class ProjectModel {
             const updatedData = projects.map((project) => [
                 project.id,
                 project.name,
+                project.project_type,
+                project.location,
+                project.description,
+                project.land_videos,
+                project.project_images,
+                project.map_url,
                 project.status,
             ]);
 
@@ -74,7 +96,13 @@ module.exports = class ProjectModel {
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
                               name: row[1],
-                              status: parseInt(row[2]),
+                              project_type: row[2],
+                              location: row[3],
+                              description: row[4],
+                              land_videos: row[5],
+                              project_images: row[6],
+                              map_url: row[7],
+                              status: parseInt(row[8]),
                           }))
                         : [];
 

@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "1WtQh01SeRDPgvU2JL9ceJ1BmT0s2yImarXAI4g08pRI";
-const range = "Sheet1!A:Z";
+const range = "Sheet1!A:W";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -24,12 +24,6 @@ module.exports = class FlatModel {
         bathrooms,
         balconies,
         kitchen,
-        lift,
-        stair,
-        generator,
-        cctv,
-        security_guard,
-        others_facilities = [],
         flat_images = [],
         feature_images = [],
         flat_videos = [],
@@ -37,6 +31,9 @@ module.exports = class FlatModel {
         project_id,
         land_details_id,
         city,
+        room_type,
+        description,
+        serial_no,
         status = 1,
         id = 0
     ) {
@@ -52,12 +49,6 @@ module.exports = class FlatModel {
         this.bathrooms = bathrooms;
         this.balconies = balconies;
         this.kitchen = kitchen;
-        this.lift = lift;
-        this.stair = stair;
-        this.generator = generator;
-        this.cctv = cctv;
-        this.security_guard = security_guard;
-        this.others_facilities = others_facilities;
         this.flat_images = flat_images;
         this.feature_images = feature_images;
         this.flat_videos = flat_videos;
@@ -65,6 +56,9 @@ module.exports = class FlatModel {
         this.project_id = project_id;
         this.land_details_id = land_details_id;
         this.city = city;
+        this.room_type = room_type;
+        this.description = description;
+        this.serial_no = serial_no;
         this.status = status;
     }
 
@@ -93,12 +87,6 @@ module.exports = class FlatModel {
                 flat.bathrooms,
                 flat.balconies,
                 flat.kitchen,
-                flat.lift,
-                flat.stair,
-                flat.generator,
-                flat.cctv,
-                flat.security_guard,
-                JSON.stringify(flat.others_facilities),
                 JSON.stringify(flat.flat_images),
                 JSON.stringify(flat.feature_images),
                 JSON.stringify(flat.flat_videos),
@@ -106,6 +94,9 @@ module.exports = class FlatModel {
                 flat.project_id,
                 flat.land_details_id,
                 flat.city,
+                flat.room_type,
+                flat.description,
+                flat.serial_no,
                 flat.status,
             ]);
 
@@ -158,20 +149,17 @@ module.exports = class FlatModel {
                               bathrooms: row[9],
                               balconies: row[10],
                               kitchen: row[11],
-                              lift: row[12],
-                              stair: row[13],
-                              generator: row[14],
-                              cctv: row[15],
-                              security_guard: row[16],
-                              others_facilities: JSON.parse(row[17] || "[]"),
-                              flat_images: JSON.parse(row[18] || "[]"),
-                              feature_images: JSON.parse(row[19] || "[]"),
-                              flat_videos: JSON.parse(row[20] || "[]"),
-                              completion_status: row[21],
-                              project_id: row[22],
-                              land_details_id: row[23],
-                              city: row[24],
-                              status: parseInt(row[25]),
+                              flat_images: JSON.parse(row[12] || "[]"),
+                              feature_images: JSON.parse(row[13] || "[]"),
+                              flat_videos: JSON.parse(row[14] || "[]"),
+                              completion_status: row[15],
+                              project_id: row[16],
+                              land_details_id: row[17],
+                              city: row[18],
+                              room_type: row[19],
+                              description: row[20],
+                              serial_no: row[21],
+                              status: parseInt(row[22]),
                           }))
                         : [];
                     callback(flat);

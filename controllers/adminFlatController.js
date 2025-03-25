@@ -1,6 +1,6 @@
 const FlatModel = require("../models/flatModel");
 const OwnerModel = require("../models/flatOwnerModel");
-const LandDetailsModel = require("../models/landDetailsModel");
+const FlatLandDetailsModel = require("../models/flatLandDetailsModel");
 const ProjectModel = require("../models/projectModel");
 
 // const getAllFlats = (req, res, next) => {
@@ -8,7 +8,7 @@ const ProjectModel = require("../models/projectModel");
 //         const newData = data.filter((el) => el.status != 0);
 
 //         newData.map((el) => {
-//             LandDetailsModel.landFindById(
+//             FlatLandDetailsModel.landFindById(
 //                 parseInt(el.land_details_id),
 //                 parseInt(el.project_id),
 //                 (data) => {
@@ -36,42 +36,48 @@ const getAllFlats = async (req, res, next) => {
         FlatModel.getAllFlat(async (flats) => {
             const newData = flats.filter((el) => el.status !== 0);
 
-            const updatedFlats = await Promise.all(
-                newData.map(
-                    (el) =>
-                        new Promise((resolve) => {
-                            LandDetailsModel.landFindById(
-                                parseInt(el.land_details_id),
-                                parseInt(el.project_id),
-                                (landData) => {
-                                    resolve({
-                                        ...el,
-                                        land_details: landData || {},
-                                    });
-                                }
-                            );
-                        })
-                )
-            );
+            if (newData.length > 0) {
+                const updatedFlats = await Promise.all(
+                    newData.map(
+                        (el) =>
+                            new Promise((resolve) => {
+                                FlatLandDetailsModel.landFindById(
+                                    parseInt(el.land_details_id),
+                                    parseInt(el.project_id),
+                                    (landData) => {
+                                        resolve({
+                                            ...el,
+                                            land_details: landData || {},
+                                        });
+                                    }
+                                );
+                            })
+                    )
+                );
 
-            const updatedFlatsWithProject = await Promise.all(
-                updatedFlats.map(
-                    (el) =>
-                        new Promise((resolve) => {
-                            ProjectModel.projectFindById(
-                                parseInt(el.land_details_id),
-                                (project) => {
-                                    resolve({
-                                        ...el,
-                                        project_name: project.name || "",
-                                    });
-                                }
-                            );
-                        })
-                )
-            );
+                const updatedFlatsWithProject = await Promise.all(
+                    updatedFlats.map(
+                        (el) =>
+                            new Promise((resolve) => {
+                                ProjectModel.projectFindById(
+                                    parseInt(el.land_details_id),
+                                    (project) => {
+                                        console.log(project);
 
-            res.status(200).json({ data: updatedFlatsWithProject });
+                                        resolve({
+                                            ...el,
+                                            project_name: project.name || "",
+                                        });
+                                    }
+                                );
+                            })
+                    )
+                );
+
+                res.status(200).json({ data: updatedFlatsWithProject });
+            } else {
+                res.status(200).json({ data: newData });
+            }
         });
     } catch (error) {
         next(error);
@@ -88,7 +94,7 @@ const getFlatDetails = (req, res, next) => {
         FlatModel.flatFindById(parseInt(id), (data) => {
             let newData = data;
 
-            OwnerModel.ownerFindById(parseInt(newData.owner_id), (data) => {
+            OwnerModel.ownerFindById(parseInt(newData.id), (data) => {
                 const ownerData = data;
 
                 newData = {
@@ -96,7 +102,7 @@ const getFlatDetails = (req, res, next) => {
                     owner_details: ownerData,
                 };
 
-                LandDetailsModel.landFindById(
+                FlatLandDetailsModel.landFindById(
                     parseInt(newData.land_details_id),
                     parseInt(newData.project_id),
                     (data) => {
@@ -146,7 +152,7 @@ const getFlatDetails = (req, res, next) => {
 //         }
 
 //         // Fetch Land Details
-//         const landDetails = await LandDetailsModel.landFindById(
+//         const landDetails = await FlatLandDetailsModel.landFindById(
 //             parseInt(flatData.land_details_id),
 //             parseInt(flatData.project_id),
 //             parseInt(flatData.id)
@@ -183,12 +189,6 @@ const addFlat = (req, res, next) => {
         bathrooms,
         balconies,
         kitchen,
-        lift,
-        stair,
-        generator,
-        cctv,
-        security_guard,
-        others_facilities,
         flat_images,
         feature_images,
         flat_videos,
@@ -196,6 +196,9 @@ const addFlat = (req, res, next) => {
         project_id,
         land_details_id,
         city,
+        room_type,
+        description,
+        serial_no,
     } = req.body;
     if (
         !type &&
@@ -222,19 +225,16 @@ const addFlat = (req, res, next) => {
             bathrooms,
             balconies,
             kitchen,
-            lift,
-            stair,
-            generator,
-            cctv,
-            security_guard,
-            others_facilities,
             flat_images,
             feature_images,
             flat_videos,
             completion_status,
             project_id,
             land_details_id,
-            city
+            city,
+            room_type,
+            description,
+            serial_no
         );
 
         flat.save((data) => {
@@ -259,12 +259,6 @@ const updateFlat = (req, res, next) => {
         bathrooms,
         balconies,
         kitchen,
-        lift,
-        stair,
-        generator,
-        cctv,
-        security_guard,
-        others_facilities,
         flat_images,
         feature_images,
         flat_videos,
@@ -272,6 +266,9 @@ const updateFlat = (req, res, next) => {
         project_id,
         land_details_id,
         city,
+        room_type,
+        description,
+        serial_no,
     } = req.body;
 
     if (!id) {
@@ -291,19 +288,16 @@ const updateFlat = (req, res, next) => {
             bathrooms,
             balconies,
             kitchen,
-            lift,
-            stair,
-            generator,
-            cctv,
-            security_guard,
-            others_facilities,
             flat_images,
             feature_images,
             flat_videos,
             completion_status,
             project_id,
             land_details_id,
-            city
+            city,
+            room_type,
+            description,
+            serial_no
         );
         flat.id = id;
         flat.save();

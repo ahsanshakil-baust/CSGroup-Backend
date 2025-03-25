@@ -13,6 +13,6 @@ router.post("/add", authurization, addOwner);
 router.post("/update", authurization, updateOwner);
 router.post("/delete", authurization, deleteOwner);
 router.get("/all", getAllOwner);
-router.get("/", getOwner);
+router.get("/:id", getOwner);
 
 module.exports = router;

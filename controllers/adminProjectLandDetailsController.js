@@ -1,57 +1,40 @@
-const FlatLandDetailsModel = require("../models/FlatLandDetailsModel");
+const ProjectLandDetailsModel = require("../models/projectLandDetailsModel");
 
-const getAllLandDetails = (req, res, next) => {
-    FlatLandDetailsModel.getAllLandDetails((data) => {
+const getAllProjectLandDetails = (req, res, next) => {
+    ProjectLandDetailsModel.getAllProjectLand((data) => {
         const newData = data.filter((el) => el.status != 0);
         res.status(200).json({ data: newData });
     });
 };
 
-const getLandDetails = (req, res, next) => {
+const getProjectLandDetails = (req, res, next) => {
     const { id, project_id } = req.body;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        FlatLandDetailsModel.landFindById({ id, project_id }, (data) => {
+        ProjectLandDetailsModel.projectLandFindById({ project_id }, (data) => {
             const newData = data.filter((el) => el.status != 0);
             res.status(200).json({ newData });
         });
     }
 };
 
-const addLandDetails = (req, res, next) => {
-    const {
-        area,
-        building_height,
-        total_share,
-        total_sqf,
-        net_sqf,
-        price,
-        reg_cost,
-        khariz_cost,
-        other_cost,
-        total_price,
-        project_id,
-    } = req.body;
+const addProjectLandDetails = (req, res, next) => {
+    const { area, building_height, total_share, total_sqf, project_id } =
+        req.body;
 
-    if (!project_id && !flat_id && !area) {
+    if (!project_id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const landDetails = new FlatLandDetailsModel(
+        const landDetails = new ProjectLandDetailsModel(
             area,
             building_height,
             total_share,
             total_sqf,
-            net_sqf,
-            price,
-            reg_cost,
-            khariz_cost,
-            other_cost,
-            total_price,
             project_id
         );
 
@@ -63,38 +46,20 @@ const addLandDetails = (req, res, next) => {
     }
 };
 
-const updateLandDetails = (req, res, next) => {
-    const {
-        id,
-        area,
-        building_height,
-        total_share,
-        total_sqf,
-        net_sqf,
-        price,
-        reg_cost,
-        khariz_cost,
-        other_cost,
-        total_price,
-        project_id,
-    } = req.body;
+const updateProjectLandDetails = (req, res, next) => {
+    const { id, area, building_height, total_share, total_sqf, project_id } =
+        req.body;
 
     if (!id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const land = new FlatLandDetailsModel(
+        const land = new ProjectLandDetailsModel(
             area,
             building_height,
             total_share,
             total_sqf,
-            net_sqf,
-            price,
-            reg_cost,
-            khariz_cost,
-            other_cost,
-            total_price,
             project_id
         );
         land.id = id;
@@ -105,14 +70,14 @@ const updateLandDetails = (req, res, next) => {
     }
 };
 
-const deleteLandDetails = (req, res, next) => {
+const deleteProjectLandDetails = (req, res, next) => {
     const { id } = req.body;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        const land = new FlatLandDetailsModel();
+        const land = new ProjectLandDetailsModel();
         land.id = id;
         land.status = 0;
         land.save();
@@ -123,9 +88,9 @@ const deleteLandDetails = (req, res, next) => {
 };
 
 module.exports = {
-    getAllLandDetails,
-    getLandDetails,
-    addLandDetails,
-    updateLandDetails,
-    deleteLandDetails,
+    getAllProjectLandDetails,
+    getProjectLandDetails,
+    addProjectLandDetails,
+    updateProjectLandDetails,
+    deleteProjectLandDetails,
 };

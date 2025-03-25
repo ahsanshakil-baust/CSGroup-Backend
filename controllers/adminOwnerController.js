@@ -8,13 +8,13 @@ const getAllOwner = (req, res, next) => {
 };
 
 const getOwner = (req, res, next) => {
-    const { id } = req.body;
+    const { id } = req.params;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        OwnerModel.ownerFindById(id, (data) => {
+        OwnerModel.ownerFindById(parseInt(id), (data) => {
             const newData = data;
             res.status(200).json({ data: newData });
         });

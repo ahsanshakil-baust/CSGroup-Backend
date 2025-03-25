@@ -23,12 +23,29 @@ const getProject = (req, res, next) => {
 };
 
 const addProject = (req, res, next) => {
-    if (req.body.name == "") {
+    const {
+        name,
+        project_type,
+        location,
+        description,
+        land_videos,
+        project_images,
+        map_url,
+    } = req.body;
+    if (name == "") {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const project = new ProjectModel(req.body.name);
+        const project = new ProjectModel(
+            name,
+            project_type,
+            location,
+            description,
+            land_videos,
+            project_images,
+            map_url
+        );
         project.save();
 
         res.status(201).json({
@@ -38,14 +55,31 @@ const addProject = (req, res, next) => {
 };
 
 const updateProject = (req, res, next) => {
-    const { id, name } = req.body;
+    const {
+        id,
+        name,
+        project_type,
+        location,
+        description,
+        land_videos,
+        project_images,
+        map_url,
+    } = req.body;
 
-    if (!id || !name) {
+    if (!id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const project = new ProjectModel(name);
+        const project = new ProjectModel(
+            name,
+            project_type,
+            location,
+            description,
+            land_videos,
+            project_images,
+            map_url
+        );
         project.id = id;
         project.save();
         res.status(201).json({

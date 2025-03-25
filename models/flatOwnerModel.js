@@ -114,7 +114,10 @@ module.exports = class OwnerModel {
 
     static async ownerFindById(id, calback) {
         OwnerModel.getAllOwners((owners) => {
-            const owner = owners.find((owner) => owner.id === id) || null;
+            const owner =
+                owners.find(
+                    (owner) => parseInt(owner.flat_id) == parseInt(id)
+                ) || null;
             calback(owner);
         });
     }

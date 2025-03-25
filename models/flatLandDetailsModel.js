@@ -11,7 +11,7 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 
-module.exports = class LandDetailsModel {
+module.exports = class FlatLandDetailsModel {
     constructor(
         area,
         building_height,
@@ -43,7 +43,7 @@ module.exports = class LandDetailsModel {
     }
 
     save(callback) {
-        LandDetailsModel.getAllLandDetails((lands) => {
+        FlatLandDetailsModel.getAllLandDetails((lands) => {
             if (this.id > 0) {
                 lands = lands.map((land) => (land.id == this.id ? this : land));
             } else {
@@ -131,7 +131,7 @@ module.exports = class LandDetailsModel {
     }
 
     static async landFindById(id, project_id, callback) {
-        LandDetailsModel.getAllLandDetails((lands) => {
+        FlatLandDetailsModel.getAllLandDetails((lands) => {
             const land =
                 lands.find(
                     (land) =>
