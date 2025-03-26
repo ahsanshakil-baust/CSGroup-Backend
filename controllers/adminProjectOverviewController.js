@@ -7,19 +7,41 @@ const getAllProjectOverview = (req, res, next) => {
     });
 };
 
-const getProjectOverview = (req, res, next) => {
-    const { id } = req.params;
-    console.log(id);
+// const getProjectOverview = (req, res, next) => {
+//     const { id } = req.params;
+//     console.log(id);
 
-    if (!id) {
-        res.status(500).json({
-            error: "Need To Pass Id.",
-        });
-    } else {
-        ProjectOverviewModel.overviewFindById(parseInt(id), (data) => {
-            const newData = data.filter((el) => el.status != 0);
-            res.status(200).json({ data });
-        });
+//     if (!id) {
+//         res.status(500).json({
+//             error: "Need To Pass Id.",
+//         });
+//     } else {
+//         ProjectOverviewModel.overviewFindById(parseInt(id), (data) => {
+//             const newData = data.filter((el) => el.status != 0);
+//             res.status(200).json({ data });
+//         });
+//     }
+// };
+
+const getProjectOverview = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        console.log(id);
+
+        if (!id) {
+            return res.status(400).json({ error: "Need To Pass Id." });
+        }
+
+        // Fetch the project overview using async/await
+        const overview = await ProjectOverviewModel.overviewFindById(
+            parseInt(id)
+        );
+
+        // Send the response
+        return res.status(200).json({ data: overview });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error." });
     }
 };
 

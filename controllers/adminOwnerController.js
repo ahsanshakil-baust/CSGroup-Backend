@@ -7,17 +7,40 @@ const getAllOwner = (req, res, next) => {
     });
 };
 
-const getOwner = (req, res, next) => {
-    const { id } = req.params;
-    if (!id) {
-        res.status(500).json({
-            error: "Need To Pass Id.",
-        });
-    } else {
-        OwnerModel.ownerFindById(parseInt(id), (data) => {
-            const newData = data;
-            res.status(200).json({ data: newData });
-        });
+// const getOwner = (req, res, next) => {
+//     const { id } = req.params;
+//     if (!id) {
+//         res.status(500).json({
+//             error: "Need To Pass Id.",
+//         });
+//     } else {
+//         OwnerModel.ownerFindById(parseInt(id), (data) => {
+//             const newData = data;
+//             res.status(200).json({ data: newData });
+//         });
+//     }
+// };
+
+const getOwner = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ error: "Need To Pass Id." });
+        }
+
+        // Fetch owner details using async/await
+        const ownerData = await OwnerModel.ownerFindById(parseInt(id));
+
+        // If no owner is found, return a 404 response
+        if (!ownerData) {
+            return res.status(404).json({ error: "Owner not found." });
+        }
+
+        // Send the response
+        return res.status(200).json({ data: ownerData });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error." });
     }
 };
 

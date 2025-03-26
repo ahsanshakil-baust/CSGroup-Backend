@@ -10,106 +10,46 @@ const getAllProject = async (req, res, next) => {
     });
 };
 
-const getProject = (req, res, next) => {
-    const { id } = req.params;
+const getProject = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
 
-    if (!id) {
-        res.status(500).json({
-            error: "Need To Pass Id.",
-        });
-    } else {
-        ProjectModel.projectFindById(parseInt(id), (data) => {
-            let newData = data;
+        if (!id) {
+            return res.status(400).json({ error: "Need To Pass Id." });
+        }
 
-            ProjectLandDetailsModel.projectLandFindById(
-                parseInt(id),
-                (data) => {
-                    newData = {
-                        ...newData,
-                        land_details: data,
-                    };
+        // Fetch all independent data in parallel
+        const [project, landDetails, overview] = await Promise.all([
+            ProjectModel.projectFindById(id),
+            ProjectLandDetailsModel.projectLandFindById(id),
+            ProjectOverviewModel.overviewFindById(id),
+        ]);
 
-                    // ProjectOverviewModel.overviewFindById(
-                    //     parseInt(id),
-                    //     (data) => {
-                    //         newData = {
-                    //             ...newData,
-                    //             overview: data,
-                    //         };
+        if (!project) {
+            return res.status(404).json({ error: "Project not found." });
+        }
 
-                    //         if (data.floors) {
-                    //             const loop = parseInt(data.floors);
-                    //             let obj = {};
+        let newData = { ...project, land_details: landDetails, overview };
 
-                    //             for (let i = 0; i < loop; i++) {
-                    //                 const key = `floor${i + 1}`;
-
-                    //                 FlatModel.flatIdByProjectFloor(
-                    //                     parseInt(id),
-                    //                     i + 1,
-                    //                     (data) => {
-                    //                         obj[key] = data;
-                    //                     }
-                    //                 );
-                    //             }
-
-                    //             console.log(obj);
-
-                    //             newData = { ...newData, floor_list: obj };
-                    //             res.status(200).json({ data: newData });
-                    //         } else {
-                    //             res.status(200).json({ data: newData });
-                    //         }
-                    //     }
-                    // );
-
-                    ProjectOverviewModel.overviewFindById(
-                        parseInt(id),
-                        async (data) => {
-                            newData = {
-                                ...newData,
-                                overview: data,
-                            };
-
-                            if (data.floors) {
-                                const loop = parseInt(data.floors);
-                                let obj = {};
-
-                                const promises = [];
-
-                                for (let i = 0; i < loop; i++) {
-                                    const key = `${i + 1}`;
-
-                                    // Push each async operation into an array of promises
-                                    promises.push(
-                                        new Promise((resolve) => {
-                                            FlatModel.flatIdByProjectFloor(
-                                                parseInt(id),
-                                                i + 1,
-                                                (flatData) => {
-                                                    obj[key] = flatData;
-                                                    resolve(); // Resolve when data is set
-                                                }
-                                            );
-                                        })
-                                    );
-                                }
-
-                                // Wait for all async operations to finish
-                                await Promise.all(promises);
-
-                                console.log(obj);
-
-                                newData = { ...newData, floor_list: obj };
-                                res.status(200).json({ data: newData });
-                            } else {
-                                res.status(200).json({ data: newData });
-                            }
-                        }
-                    );
-                }
+        // If overview contains floors, fetch all flats in parallel
+        if (overview?.floors) {
+            const floorPromises = Array.from(
+                { length: overview.floors },
+                (_, i) => FlatModel.flatIdByProjectFloor(id, i + 1)
             );
-        });
+
+            const floorResults = await Promise.all(floorPromises);
+            const floor_list = Object.fromEntries(
+                floorResults.map((flats, i) => [`${i + 1}`, flats])
+            );
+
+            newData.floor_list = floor_list;
+        }
+
+        return res.status(200).json({ data: newData });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error." });
     }
 };
 

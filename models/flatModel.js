@@ -168,25 +168,80 @@ module.exports = class FlatModel {
         );
     }
 
-    static async flatFindById(id, callback) {
-        FlatModel.getAllFlat((flats) => {
-            const flat = flats.find((flat) => flat.id === id) || null;
-            callback(flat);
+    // static async flatFindById(id, callback) {
+    //     FlatModel.getAllFlat((flats) => {
+    //         const flat = flats.find((flat) => flat.id === id) || null;
+    //         callback(flat);
+    //     });
+    // }
+
+    // static flatIdByProjectFloor(id, floor, callback) {
+    //     FlatModel.getAllFlat((flats) => {
+    //         const flat = flats.filter(
+    //             (flat) => flat.project_id == id && flat.floor == floor
+    //         );
+    //         const newData = [];
+
+    //         flat.forEach((el) =>
+    //             newData.push({ id: el.id, serial_no: el.serial_no })
+    //         );
+
+    //         callback(newData);
+    //     });
+    // }
+
+    // static async projectFindById(id) {
+    //     return new Promise((resolve, reject) => {
+    //         ProjectModel.getAllProjects((projects) => {
+    //             if (!projects) return reject(new Error("No projects found"));
+    //             const project = projects.find((p) => p.id === id) || null;
+    //             resolve(project);
+    //         });
+    //     });
+    // }
+
+    static async flatFindById(id) {
+        return new Promise((resolve, reject) => {
+            FlatModel.getAllFlat((flats) => {
+                if (!flats) return reject(new Error("No flats found"));
+
+                const flat = flats.find((flat) => flat.id === id) || null;
+                resolve(flat);
+            });
         });
     }
 
-    static flatIdByProjectFloor(id, floor, callback) {
-        FlatModel.getAllFlat((flats) => {
-            const flat = flats.filter(
-                (flat) => flat.project_id == id && flat.floor == floor
-            );
-            const newData = [];
+    // static async flatIdByProjectFloor(id, floor) {
+    //     return new Promise((resolve, reject) => {
+    //         FlatModel.getAllFlat((flats) => {
+    //             if (!flats) return reject(new Error("No flats found"));
 
-            flat.forEach((el) =>
-                newData.push({ id: el.id, serial_no: el.serial_no })
-            );
+    //             const newData = flats
+    //                 .filter(
+    //                     (flat) => flat.project_id == id && flat.floor == floor
+    //                 )
+    //                 .map(({ id, serial_no }) => ({ id, serial_no }));
 
-            callback(newData);
+    //             resolve(newData);
+    //         });
+    //     });
+    // }
+
+    static async flatIdByProjectFloor(id, floor) {
+        return new Promise((resolve, reject) => {
+            FlatModel.getAllFlat((flats) => {
+                if (!flats) return reject(new Error("No flats found"));
+
+                // Filter and sort in a single pass
+                const newData = flats
+                    .filter(
+                        (flat) => flat.project_id == id && flat.floor == floor
+                    ) // Filter flats by project_id and floor
+                    .map(({ id, serial_no }) => ({ id, serial_no })) // Map to only the necessary properties
+                    .sort((a, b) => a.serial_no - b.serial_no); // Sort by serial_no numerically
+
+                resolve(newData);
+            });
         });
     }
 };

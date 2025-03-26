@@ -4,191 +4,88 @@ const FlatLandDetailsModel = require("../models/flatLandDetailsModel");
 const ProjectModel = require("../models/projectModel");
 const ProjectOverviewModel = require("../models/projectLandOverview");
 
-// const getAllFlats = (req, res, next) => {
-//     FlatModel.getAllFlat((data) => {
-//         const newData = data.filter((el) => el.status != 0);
-
-//         newData.map((el) => {
-//             FlatLandDetailsModel.landFindById(
-//                 parseInt(el.land_details_id),
-//                 parseInt(el.project_id),
-//                 (data) => {
-//                     // console.log(data);
-
-//                     // res.status(200).json({
-//                     //     data: {
-//                     //         ...newData,
-//                     //         land_details: data ? data : {},
-//                     //     },
-//                     // });
-//                     data, el;
-//                 }
-//             );
-//         });
-
-//         res.status(200).json({
-//             data: newData,
-//         });
-//     });
-// };
-
 const getAllFlats = async (req, res, next) => {
     try {
-        FlatModel.getAllFlat(async (flats) => {
-            const newData = flats.filter((el) => el.status !== 0);
-
-            if (newData.length > 0) {
-                const updatedFlats = await Promise.all(
-                    newData.map(
-                        (el) =>
-                            new Promise((resolve) => {
-                                FlatLandDetailsModel.landFindById(
-                                    parseInt(el.land_details_id),
-                                    parseInt(el.project_id),
-                                    (landData) => {
-                                        resolve({
-                                            ...el,
-                                            land_details: landData || {},
-                                        });
-                                    }
-                                );
-                            })
-                    )
-                );
-
-                const updatedFlatsWithProject = await Promise.all(
-                    updatedFlats.map(
-                        (el) =>
-                            new Promise((resolve) => {
-                                ProjectModel.projectFindById(
-                                    parseInt(el.land_details_id),
-                                    (project) => {
-                                        console.log(project);
-
-                                        resolve({
-                                            ...el,
-                                            project_name: project.name || "",
-                                        });
-                                    }
-                                );
-                            })
-                    )
-                );
-
-                res.status(200).json({ data: updatedFlatsWithProject });
-            } else {
-                res.status(200).json({ data: newData });
-            }
+        // Convert getAllFlat to return a Promise
+        const flats = await new Promise((resolve, reject) => {
+            FlatModel.getAllFlat((flats) => {
+                if (!flats) return reject(new Error("No flats found"));
+                resolve(flats);
+            });
         });
+
+        // Filter flats where status !== 0
+        const filteredFlats = flats.filter((el) => el.status !== 0);
+
+        if (filteredFlats.length === 0) {
+            return res.status(200).json({ data: [] });
+        }
+
+        // Fetch land details and project details in parallel
+        const flatDetailsPromises = filteredFlats.map(async (el) => {
+            const [landDetails, project] = await Promise.all([
+                FlatLandDetailsModel.landFindById(
+                    el.land_details_id,
+                    el.project_id
+                ),
+                ProjectModel.projectFindById(el.land_details_id),
+            ]);
+
+            return {
+                ...el,
+                land_details: landDetails || {},
+                project_name: project?.name || "",
+            };
+        });
+
+        // Wait for all promises to resolve
+        const updatedFlats = await Promise.all(flatDetailsPromises);
+
+        res.status(200).json({ data: updatedFlats });
     } catch (error) {
         next(error);
     }
 };
 
-const getFlatDetails = (req, res, next) => {
-    const { id } = req.params;
-    if (!id) {
-        res.status(500).json({
-            error: "Need To Pass Id.",
-        });
-    } else {
-        FlatModel.flatFindById(parseInt(id), (data) => {
-            let newData = data;
+const getFlatDetails = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (!id) {
+            return res.status(400).json({ error: "Need To Pass Id." });
+        }
 
-            OwnerModel.ownerFindById(parseInt(newData.id), (data) => {
-                const ownerData = data;
+        // Fetch flat details
+        const flat = await FlatModel.flatFindById(id);
+        if (!flat) {
+            return res.status(404).json({ error: "Flat not found." });
+        }
 
-                newData = {
-                    ...newData,
-                    owner_details: ownerData,
-                };
+        // Fetch all dependent data in parallel
+        const [owner, landDetails, project, overview] = await Promise.all([
+            OwnerModel.ownerFindById(flat.id),
+            FlatLandDetailsModel.landFindById(
+                flat.land_details_id,
+                flat.project_id
+            ),
+            ProjectModel.projectFindById(flat.project_id),
+            ProjectOverviewModel.overviewFindById(flat.project_id),
+        ]);
 
-                FlatLandDetailsModel.landFindById(
-                    parseInt(newData.land_details_id),
-                    parseInt(newData.project_id),
-                    (data) => {
-                        newData = {
-                            ...newData,
-                            land_details: data,
-                        };
+        // Construct response
+        const newData = {
+            ...flat,
+            owner_details: owner || {},
+            land_details: landDetails || {},
+            project_details: project || {},
+            overview: overview || {},
+        };
 
-                        ProjectModel.projectFindById(
-                            parseInt(newData.project_id),
-                            (data) => {
-                                newData = {
-                                    ...newData,
-                                    project_details: data,
-                                };
-
-                                ProjectOverviewModel.overviewFindById(
-                                    parseInt(newData.project_id),
-                                    (data) => {
-                                        console.log(newData.project_id);
-
-                                        newData = {
-                                            ...newData,
-                                            overview: data,
-                                        };
-
-                                        res.status(200).json({ data: newData });
-                                    }
-                                );
-                            }
-                        );
-                    }
-                );
-            });
-        });
+        return res.status(200).json({ data: newData });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error." });
     }
 };
-
-// const getFlatDetails = async (req, res, next) => {
-//     try {
-//         const { id } = req.params;
-//         console.log(id);
-
-//         if (!id) {
-//             return res.status(400).json({ error: "Need to pass ID." });
-//         }
-
-//         // Fetch Flat Details
-//         const flatData = await FlatModel.flatFindById(parseInt(id));
-//         if (!flatData) {
-//             return res.status(404).json({ error: "Flat not found." });
-//         }
-
-//         // Fetch Owner Details
-//         const ownerData = await OwnerModel.ownerFindById(
-//             parseInt(flatData.owner_id)
-//         );
-//         if (ownerData) {
-//             flatData.owner_details = ownerData;
-//         }
-
-//         // Fetch Land Details
-//         const landDetails = await FlatLandDetailsModel.landFindById(
-//             parseInt(flatData.land_details_id),
-//             parseInt(flatData.project_id),
-//             parseInt(flatData.id)
-//         );
-//         if (landDetails) {
-//             flatData.land_details = landDetails;
-//         }
-
-//         // Fetch Project Details
-//         const projectDetails = await ProjectModel.projectFindById(
-//             parseInt(flatData.project_id)
-//         );
-//         if (projectDetails) {
-//             flatData.project_details = projectDetails;
-//         }
-
-//         res.status(200).json({ data: flatData });
-//     } catch (error) {
-//         console.error("Error fetching flat details:", error);
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// };
 
 const addFlat = (req, res, next) => {
     const {

@@ -130,16 +130,33 @@ module.exports = class FlatLandDetailsModel {
         );
     }
 
-    static async landFindById(id, project_id, callback) {
-        FlatLandDetailsModel.getAllLandDetails((lands) => {
-            const land =
-                lands.find(
-                    (land) =>
-                        parseInt(land.id) === id &&
-                        parseInt(land.project_id) === project_id
-                ) || null;
+    // static async landFindById(id, project_id, callback) {
+    //     FlatLandDetailsModel.getAllLandDetails((lands) => {
+    //         const land =
+    //             lands.find(
+    //                 (land) =>
+    //                     parseInt(land.id) === id &&
+    //                     parseInt(land.project_id) === project_id
+    //             ) || null;
 
-            callback(land);
+    //         callback(land);
+    //     });
+    // }
+
+    static async landFindById(id, project_id) {
+        return new Promise((resolve, reject) => {
+            FlatLandDetailsModel.getAllLandDetails((lands) => {
+                if (!lands) return reject(new Error("No land details found"));
+
+                const land =
+                    lands.find(
+                        (land) =>
+                            parseInt(land.id) === parseInt(id) &&
+                            parseInt(land.project_id) === parseInt(project_id)
+                    ) || null;
+
+                resolve(land);
+            });
         });
     }
 };

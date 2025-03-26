@@ -102,10 +102,22 @@ module.exports = class ProjectLandDetailsModel {
         );
     }
 
-    static async projectLandFindById(id, callback) {
-        ProjectLandDetailsModel.getAllProjectLand((pLands) => {
-            const el = pLands.find((el) => el.project_id == id) || null;
-            callback(el);
+    // static async projectLandFindById(id, callback) {
+    //     ProjectLandDetailsModel.getAllProjectLand((pLands) => {
+    //         const el = pLands.find((el) => el.project_id == id) || null;
+    //         callback(el);
+    //     });
+    // }
+
+    static async projectLandFindById(id) {
+        return new Promise((resolve, reject) => {
+            ProjectLandDetailsModel.getAllProjectLand((pLands) => {
+                if (!pLands)
+                    return reject(new Error("No project land details found"));
+
+                const el = pLands.find((el) => el.project_id == id) || null;
+                resolve(el);
+            });
         });
     }
 };

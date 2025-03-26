@@ -113,10 +113,22 @@ module.exports = class ProjectModel {
         );
     }
 
-    static async projectFindById(id, callback) {
-        ProjectModel.getAllProjects((flats) => {
-            const flat = flats.find((project) => project.id === id) || null;
-            callback(flat);
+    // static async projectFindById(id, callback) {
+    //     ProjectModel.getAllProjects((flats) => {
+    //         const flat = flats.find((project) => project.id === id) || null;
+    //         callback(flat);
+    //     });
+    // }
+
+    static async projectFindById(id) {
+        return new Promise((resolve, reject) => {
+            ProjectModel.getAllProjects((projects) => {
+                if (!projects) return reject(new Error("No projects found"));
+
+                const project =
+                    projects.find((project) => project.id === id) || null;
+                resolve(project);
+            });
         });
     }
 };

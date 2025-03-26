@@ -112,13 +112,27 @@ module.exports = class OwnerModel {
         );
     }
 
-    static async ownerFindById(id, calback) {
-        OwnerModel.getAllOwners((owners) => {
-            const owner =
-                owners.find(
-                    (owner) => parseInt(owner.flat_id) == parseInt(id)
-                ) || null;
-            calback(owner);
+    // static async ownerFindById(id, calback) {
+    //     OwnerModel.getAllOwners((owners) => {
+    //         const owner =
+    //             owners.find(
+    //                 (owner) => parseInt(owner.flat_id) == parseInt(id)
+    //             ) || null;
+    //         calback(owner);
+    //     });
+    // }
+
+    static async ownerFindById(id) {
+        return new Promise((resolve, reject) => {
+            OwnerModel.getAllOwners((owners) => {
+                if (!owners) return reject(new Error("No owners found"));
+
+                const owner =
+                    owners.find(
+                        (owner) => parseInt(owner.flat_id) === parseInt(id)
+                    ) || null;
+                resolve(owner);
+            });
         });
     }
 };

@@ -132,13 +132,28 @@ module.exports = class ProjectOverviewModel {
         );
     }
 
-    static async overviewFindById(id, callback) {
-        ProjectOverviewModel.getAllOverview((overviews) => {
-            const el =
-                overviews.find(
-                    (el) => parseInt(el.project_id) == parseInt(id)
-                ) || null;
-            callback(el);
+    // static async overviewFindById(id, callback) {
+    //     ProjectOverviewModel.getAllOverview((overviews) => {
+    //         const el =
+    //             overviews.find(
+    //                 (el) => parseInt(el.project_id) == parseInt(id)
+    //             ) || null;
+    //         callback(el);
+    //     });
+    // }
+
+    static async overviewFindById(id) {
+        return new Promise((resolve, reject) => {
+            ProjectOverviewModel.getAllOverview((overviews) => {
+                if (!overviews)
+                    return reject(new Error("No overview data found"));
+
+                const el =
+                    overviews.find(
+                        (el) => parseInt(el.project_id) === parseInt(id)
+                    ) || null;
+                resolve(el);
+            });
         });
     }
 };
