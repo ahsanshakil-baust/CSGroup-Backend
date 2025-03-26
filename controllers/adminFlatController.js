@@ -2,6 +2,7 @@ const FlatModel = require("../models/flatModel");
 const OwnerModel = require("../models/flatOwnerModel");
 const FlatLandDetailsModel = require("../models/flatLandDetailsModel");
 const ProjectModel = require("../models/projectModel");
+const ProjectOverviewModel = require("../models/projectLandOverview");
 
 // const getAllFlats = (req, res, next) => {
 //     FlatModel.getAllFlat((data) => {
@@ -118,7 +119,20 @@ const getFlatDetails = (req, res, next) => {
                                     ...newData,
                                     project_details: data,
                                 };
-                                res.status(200).json({ data: newData });
+
+                                ProjectOverviewModel.overviewFindById(
+                                    parseInt(newData.project_id),
+                                    (data) => {
+                                        console.log(newData.project_id);
+
+                                        newData = {
+                                            ...newData,
+                                            overview: data,
+                                        };
+
+                                        res.status(200).json({ data: newData });
+                                    }
+                                );
                             }
                         );
                     }

@@ -8,15 +8,17 @@ const getAllProjectOverview = (req, res, next) => {
 };
 
 const getProjectOverview = (req, res, next) => {
-    const { id, project_id } = req.body;
+    const { id } = req.params;
+    console.log(id);
+
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        ProjectOverviewModel.overviewFindById({ project_id }, (data) => {
+        ProjectOverviewModel.overviewFindById(parseInt(id), (data) => {
             const newData = data.filter((el) => el.status != 0);
-            res.status(200).json({ newData });
+            res.status(200).json({ data });
         });
     }
 };

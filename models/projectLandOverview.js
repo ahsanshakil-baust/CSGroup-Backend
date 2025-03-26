@@ -134,7 +134,10 @@ module.exports = class ProjectOverviewModel {
 
     static async overviewFindById(id, callback) {
         ProjectOverviewModel.getAllOverview((overviews) => {
-            const el = overviews.find((el) => el.project_id == id) || null;
+            const el =
+                overviews.find(
+                    (el) => parseInt(el.project_id) == parseInt(id)
+                ) || null;
             callback(el);
         });
     }

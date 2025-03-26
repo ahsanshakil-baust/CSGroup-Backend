@@ -174,4 +174,19 @@ module.exports = class FlatModel {
             callback(flat);
         });
     }
+
+    static flatIdByProjectFloor(id, floor, callback) {
+        FlatModel.getAllFlat((flats) => {
+            const flat = flats.filter(
+                (flat) => flat.project_id == id && flat.floor == floor
+            );
+            const newData = [];
+
+            flat.forEach((el) =>
+                newData.push({ id: el.id, serial_no: el.serial_no })
+            );
+
+            callback(newData);
+        });
+    }
 };

@@ -1,7 +1,10 @@
+const FlatModel = require("../models/flatModel");
+const ProjectLandDetailsModel = require("../models/projectLandDetailsModel");
+const ProjectOverviewModel = require("../models/projectLandOverview");
 const ProjectModel = require("../models/projectModel");
 
-const getAllProject = (req, res, next) => {
-    ProjectModel.getAllProjects((data) => {
+const getAllProject = async (req, res, next) => {
+    ProjectModel.getAllProjects(async (data) => {
         const newData = data.filter((el) => el.status != 0);
         res.status(200).json({ data: newData });
     });
@@ -16,8 +19,96 @@ const getProject = (req, res, next) => {
         });
     } else {
         ProjectModel.projectFindById(parseInt(id), (data) => {
-            const newData = data;
-            res.status(200).json({ data: newData });
+            let newData = data;
+
+            ProjectLandDetailsModel.projectLandFindById(
+                parseInt(id),
+                (data) => {
+                    newData = {
+                        ...newData,
+                        land_details: data,
+                    };
+
+                    // ProjectOverviewModel.overviewFindById(
+                    //     parseInt(id),
+                    //     (data) => {
+                    //         newData = {
+                    //             ...newData,
+                    //             overview: data,
+                    //         };
+
+                    //         if (data.floors) {
+                    //             const loop = parseInt(data.floors);
+                    //             let obj = {};
+
+                    //             for (let i = 0; i < loop; i++) {
+                    //                 const key = `floor${i + 1}`;
+
+                    //                 FlatModel.flatIdByProjectFloor(
+                    //                     parseInt(id),
+                    //                     i + 1,
+                    //                     (data) => {
+                    //                         obj[key] = data;
+                    //                     }
+                    //                 );
+                    //             }
+
+                    //             console.log(obj);
+
+                    //             newData = { ...newData, floor_list: obj };
+                    //             res.status(200).json({ data: newData });
+                    //         } else {
+                    //             res.status(200).json({ data: newData });
+                    //         }
+                    //     }
+                    // );
+
+                    ProjectOverviewModel.overviewFindById(
+                        parseInt(id),
+                        async (data) => {
+                            newData = {
+                                ...newData,
+                                overview: data,
+                            };
+
+                            if (data.floors) {
+                                const loop = parseInt(data.floors);
+                                let obj = {};
+
+                                const promises = [];
+
+                                for (let i = 0; i < loop; i++) {
+                                    const key = `${i + 1}`;
+
+                                    // Push each async operation into an array of promises
+                                    promises.push(
+                                        new Promise((resolve) => {
+                                            FlatModel.flatIdByProjectFloor(
+                                                parseInt(id),
+                                                i + 1,
+                                                (flatData) => {
+                                                    obj[key] = flatData;
+                                                    resolve(); // Resolve when data is set
+                                                }
+                                            );
+                                        })
+                                    );
+                                }
+
+                                // Wait for all async operations to finish
+                                await Promise.all(promises);
+
+                                console.log(obj);
+
+                                newData = { ...newData, floor_list: obj };
+                                res.status(200).json({ data: newData });
+                            } else {
+                                res.status(200).json({ data: newData });
+                            }
+                        }
+                    );
+                }
+            );
         });
     }
 };
