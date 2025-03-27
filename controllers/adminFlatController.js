@@ -50,8 +50,8 @@ const getAllFlats = async (req, res, next) => {
 const getFlatDetails = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
-        if (!id) {
-            return res.status(400).json({ error: "Need To Pass Id." });
+        if (Number.isNaN(id)) {
+            return res.status(400).json({ error: "Invalid or missing ID." });
         }
 
         // Fetch flat details
@@ -60,15 +60,29 @@ const getFlatDetails = async (req, res, next) => {
             return res.status(404).json({ error: "Flat not found." });
         }
 
-        // Fetch all dependent data in parallel
+        // Fetch all dependent data in parallel with error handling
         const [owner, landDetails, project, overview] = await Promise.all([
-            OwnerModel.ownerFindById(flat.id),
+            OwnerModel.ownerFindById(flat.id).catch((err) => {
+                console.error("Owner fetch error:", err);
+                return null;
+            }),
             FlatLandDetailsModel.landFindById(
                 flat.land_details_id,
                 flat.project_id
+            ).catch((err) => {
+                console.error("Land details fetch error:", err);
+                return null;
+            }),
+            ProjectModel.projectFindById(flat.project_id).catch((err) => {
+                console.error("Project fetch error:", err);
+                return null;
+            }),
+            ProjectOverviewModel.overviewFindById(flat.project_id).catch(
+                (err) => {
+                    console.error("Overview fetch error:", err);
+                    return null;
+                }
             ),
-            ProjectModel.projectFindById(flat.project_id),
-            ProjectOverviewModel.overviewFindById(flat.project_id),
         ]);
 
         // Construct response
@@ -82,7 +96,7 @@ const getFlatDetails = async (req, res, next) => {
 
         return res.status(200).json({ data: newData });
     } catch (error) {
-        console.error(error);
+        console.error("Internal Server Error:", error);
         return res.status(500).json({ error: "Internal Server Error." });
     }
 };

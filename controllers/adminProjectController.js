@@ -78,12 +78,14 @@ const getProject = async (req, res, next) => {
         if (overview?.floors) {
             const floorPromises = Array.from(
                 { length: overview.floors },
-                (_, i) => FlatModel.flatIdByProjectFloor(id, i + 1)
+                (_, i) => FlatModel.flatIdByProjectFloor(id, i)
             );
 
             const floorResults = await Promise.all(floorPromises);
+
             const floor_list = floorResults.map((flats, i) => ({
-                floor_number: i + 1,
+                floor_number: i,
+                room_type: flats.length > 0 && flats[0].room_type,
                 flats: flats,
             }));
 

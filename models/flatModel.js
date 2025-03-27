@@ -237,7 +237,11 @@ module.exports = class FlatModel {
                     .filter(
                         (flat) => flat.project_id == id && flat.floor == floor
                     ) // Filter flats by project_id and floor
-                    .map(({ id, serial_no }) => ({ id, serial_no })) // Map to only the necessary properties
+                    .map(({ id, serial_no, room_type }) => ({
+                        id,
+                        serial_no,
+                        room_type,
+                    })) // Map to only the necessary properties
                     .sort((a, b) => a.serial_no - b.serial_no); // Sort by serial_no numerically
 
                 resolve(newData);
