@@ -10,6 +10,49 @@ const getAllProject = async (req, res, next) => {
     });
 };
 
+// const getProject = async (req, res, next) => {
+//     try {
+//         const id = parseInt(req.params.id);
+
+//         if (!id) {
+//             return res.status(400).json({ error: "Need To Pass Id." });
+//         }
+
+//         // Fetch all independent data in parallel
+//         const [project, landDetails, overview] = await Promise.all([
+//             ProjectModel.projectFindById(id),
+//             ProjectLandDetailsModel.projectLandFindById(id),
+//             ProjectOverviewModel.overviewFindById(id),
+//         ]);
+
+//         if (!project) {
+//             return res.status(404).json({ error: "Project not found." });
+//         }
+
+//         let newData = { ...project, land_details: landDetails, overview };
+
+//         // If overview contains floors, fetch all flats in parallel
+//         if (overview?.floors) {
+//             const floorPromises = Array.from(
+//                 { length: overview.floors },
+//                 (_, i) => FlatModel.flatIdByProjectFloor(id, i + 1)
+//             );
+
+//             const floorResults = await Promise.all(floorPromises);
+//             const floor_list = Object.fromEntries(
+//                 floorResults.map((flats, i) => [`${i + 1}`, flats])
+//             );
+
+//             newData.floor_list = floor_list;
+//         }
+
+//         return res.status(200).json({ data: newData });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ error: "Internal Server Error." });
+//     }
+// };
+
 const getProject = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
@@ -39,9 +82,10 @@ const getProject = async (req, res, next) => {
             );
 
             const floorResults = await Promise.all(floorPromises);
-            const floor_list = Object.fromEntries(
-                floorResults.map((flats, i) => [`${i + 1}`, flats])
-            );
+            const floor_list = floorResults.map((flats, i) => ({
+                floor_number: i + 1,
+                flats: flats,
+            }));
 
             newData.floor_list = floor_list;
         }
