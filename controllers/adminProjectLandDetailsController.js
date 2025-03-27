@@ -23,21 +23,21 @@ const getAllProjectLandDetails = (req, res, next) => {
 
 const getProjectLandDetails = async (req, res, next) => {
     try {
-        const { id, project_id } = req.body;
+        const { id } = req.params;
 
         if (!id) {
             return res.status(400).json({ error: "Need To Pass Id." });
         }
 
         // Fetch land details using async/await
-        const landDetails = await ProjectLandDetailsModel.projectLandFindById({
-            project_id,
-        });
+        const landDetails = await ProjectLandDetailsModel.projectLandFindById(
+            id
+        );
 
         // Filter out data with status 0
 
         // Send the response
-        return res.status(200).json({ landDetails });
+        return res.status(200).json({ data: landDetails });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal Server Error." });

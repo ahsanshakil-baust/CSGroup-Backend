@@ -14,6 +14,6 @@ router.post("/add", authurization, addProjectLandDetails);
 router.post("/update", authurization, updateProjectLandDetails);
 router.post("/delete", authurization, deleteProjectLandDetails);
 router.get("/all", getAllProjectLandDetails);
-router.get("/", getProjectLandDetails);
+router.get("/:id", getProjectLandDetails);
 
 module.exports = router;

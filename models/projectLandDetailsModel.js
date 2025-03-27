@@ -115,8 +115,11 @@ module.exports = class ProjectLandDetailsModel {
                 if (!pLands)
                     return reject(new Error("No project land details found"));
 
-                const el = pLands.find((el) => el.project_id == id) || null;
-                resolve(el);
+                const el = pLands.filter(
+                    (el) => parseInt(el.project_id) == parseInt(id)
+                );
+
+                resolve(el[0]);
             });
         });
     }

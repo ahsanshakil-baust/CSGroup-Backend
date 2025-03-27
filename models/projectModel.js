@@ -34,6 +34,53 @@ module.exports = class ProjectModel {
         this.status = status;
     }
 
+    // save(callback) {
+    //     ProjectModel.getAllProjects((projects) => {
+    //         if (this.id > 0) {
+    //             projects = projects.map((project) =>
+    //                 project.id == this.id ? this : project
+    //             );
+    //         } else {
+    //             this.id = projects.length + 1;
+    //             projects.push(this);
+    //             callback(this.id);
+    //         }
+
+    //         const updatedData = projects.map((project) => [
+    //             project.id,
+    //             project.name,
+    //             project.project_type,
+    //             project.location,
+    //             project.description,
+    //             JSON.stringify(project.land_videos),
+    //             JSON.stringify(project.project_images),
+    //             project.map_url,
+    //             project.status,
+    //         ]);
+
+    //         sheets.spreadsheets.values.update(
+    //             {
+    //                 spreadsheetId: sheetId,
+    //                 range: range,
+    //                 valueInputOption: "RAW",
+    //                 requestBody: { values: updatedData },
+    //             },
+    //             (err, res) => {
+    //                 if (err) {
+    //                     console.error(
+    //                         "Error saving data to Google Sheets:",
+    //                         err
+    //                     );
+    //                 } else {
+    //                     console.log(
+    //                         "Data saved successfully to Google Sheets!"
+    //                     );
+    //                 }
+    //             }
+    //         );
+    //     });
+    // }
+
     save(callback) {
         ProjectModel.getAllProjects((projects) => {
             if (this.id > 0) {
@@ -43,8 +90,10 @@ module.exports = class ProjectModel {
             } else {
                 this.id = projects.length + 1;
                 projects.push(this);
-                callback(this.id);
             }
+
+            // Ensure callback is always called
+            if (callback) callback(this.id);
 
             const updatedData = projects.map((project) => [
                 project.id,
@@ -57,6 +106,13 @@ module.exports = class ProjectModel {
                 project.map_url,
                 project.status,
             ]);
+
+            if (!sheets || !sheetId || !range) {
+                console.error(
+                    "Missing required variables for Google Sheets API."
+                );
+                return;
+            }
 
             sheets.spreadsheets.values.update(
                 {
