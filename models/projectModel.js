@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "15tL2aXEHssjjUF4MwwrmK6EaSviKfq28Pq_TWKn4sjc";
-const range = "Sheet1!A:I";
+const range = "Sheet1!A:J";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -20,6 +20,7 @@ module.exports = class ProjectModel {
         land_videos = [],
         project_images = [],
         map_url,
+        project_structure,
         id = 0,
         status = 1
     ) {
@@ -31,55 +32,9 @@ module.exports = class ProjectModel {
         this.land_videos = land_videos;
         this.project_images = project_images;
         this.map_url = map_url;
+        this.project_structure = project_structure;
         this.status = status;
     }
-
-    // save(callback) {
-    //     ProjectModel.getAllProjects((projects) => {
-    //         if (this.id > 0) {
-    //             projects = projects.map((project) =>
-    //                 project.id == this.id ? this : project
-    //             );
-    //         } else {
-    //             this.id = projects.length + 1;
-    //             projects.push(this);
-    //             callback(this.id);
-    //         }
-
-    //         const updatedData = projects.map((project) => [
-    //             project.id,
-    //             project.name,
-    //             project.project_type,
-    //             project.location,
-    //             project.description,
-    //             JSON.stringify(project.land_videos),
-    //             JSON.stringify(project.project_images),
-    //             project.map_url,
-    //             project.status,
-    //         ]);
-
-    //         sheets.spreadsheets.values.update(
-    //             {
-    //                 spreadsheetId: sheetId,
-    //                 range: range,
-    //                 valueInputOption: "RAW",
-    //                 requestBody: { values: updatedData },
-    //             },
-    //             (err, res) => {
-    //                 if (err) {
-    //                     console.error(
-    //                         "Error saving data to Google Sheets:",
-    //                         err
-    //                     );
-    //                 } else {
-    //                     console.log(
-    //                         "Data saved successfully to Google Sheets!"
-    //                     );
-    //                 }
-    //             }
-    //         );
-    //     });
-    // }
 
     save(callback) {
         ProjectModel.getAllProjects((projects) => {
@@ -104,6 +59,7 @@ module.exports = class ProjectModel {
                 JSON.stringify(project.land_videos),
                 JSON.stringify(project.project_images),
                 project.map_url,
+                project.project_structure,
                 project.status,
             ]);
 
@@ -159,7 +115,8 @@ module.exports = class ProjectModel {
                               land_videos: JSON.parse(row[5] || "[]"),
                               project_images: JSON.parse(row[6] || "[]"),
                               map_url: row[7],
-                              status: parseInt(row[8]),
+                              project_structure: row[8],
+                              status: parseInt(row[9]),
                           }))
                         : [];
 
@@ -168,13 +125,6 @@ module.exports = class ProjectModel {
             }
         );
     }
-
-    // static async projectFindById(id, callback) {
-    //     ProjectModel.getAllProjects((flats) => {
-    //         const flat = flats.find((project) => project.id === id) || null;
-    //         callback(flat);
-    //     });
-    // }
 
     static async projectFindById(id) {
         return new Promise((resolve, reject) => {
