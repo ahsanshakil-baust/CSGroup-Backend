@@ -28,13 +28,13 @@ const getAllFlats = async (req, res, next) => {
                     el.land_details_id,
                     el.project_id
                 ),
-                ProjectModel.projectFindById(el.land_details_id),
+                ProjectModel.projectFindById(el.project_id),
             ]);
 
             return {
                 ...el,
                 land_details: landDetails || {},
-                project_name: project?.name || "",
+                project_details: project || {},
             };
         });
 

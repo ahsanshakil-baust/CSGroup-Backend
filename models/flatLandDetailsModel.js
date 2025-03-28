@@ -23,7 +23,7 @@ module.exports = class FlatLandDetailsModel {
         khariz_cost,
         other_cost,
         total_price,
-        project_id,
+        flat_id,
         id = 0,
         status = 1
     ) {
@@ -38,7 +38,7 @@ module.exports = class FlatLandDetailsModel {
         this.khariz_cost = khariz_cost;
         this.other_cost = other_cost;
         this.total_price = total_price;
-        this.project_id = project_id;
+        this.flat_id = flat_id;
         this.status = status;
     }
 
@@ -51,7 +51,7 @@ module.exports = class FlatLandDetailsModel {
                 lands.push(this);
                 callback({
                     id: this.id,
-                    project_id: parseInt(this.project_id),
+                    flat_id: parseInt(this.flat_id),
                 });
             }
 
@@ -67,7 +67,7 @@ module.exports = class FlatLandDetailsModel {
                 land.khariz_cost,
                 land.other_cost,
                 land.total_price,
-                land.project_id,
+                land.flat_id,
                 land.status,
             ]);
 
@@ -119,7 +119,7 @@ module.exports = class FlatLandDetailsModel {
                               khariz_cost: row[8],
                               other_cost: row[9],
                               total_price: row[10],
-                              project_id: row[11],
+                              flat_id: row[11],
                               status: parseInt(row[12], 10),
                           }))
                         : [];
@@ -130,29 +130,27 @@ module.exports = class FlatLandDetailsModel {
         );
     }
 
-    // static async landFindById(id, project_id, callback) {
+    // static async landFindById(id, flat_id, callback) {
     //     FlatLandDetailsModel.getAllLandDetails((lands) => {
     //         const land =
     //             lands.find(
     //                 (land) =>
     //                     parseInt(land.id) === id &&
-    //                     parseInt(land.project_id) === project_id
+    //                     parseInt(land.flat_id) === flat_id
     //             ) || null;
 
     //         callback(land);
     //     });
     // }
 
-    static async landFindById(id, project_id) {
+    static async landFindById(id) {
         return new Promise((resolve, reject) => {
             FlatLandDetailsModel.getAllLandDetails((lands) => {
                 if (!lands) return reject(new Error("No land details found"));
 
                 const land =
                     lands.find(
-                        (land) =>
-                            parseInt(land.id) === parseInt(id) &&
-                            parseInt(land.project_id) === parseInt(project_id)
+                        (land) => parseInt(land.flat_id) === parseInt(id)
                     ) || null;
 
                 resolve(land);

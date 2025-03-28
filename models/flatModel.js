@@ -29,7 +29,7 @@ module.exports = class FlatModel {
         flat_videos = [],
         completion_status,
         project_id,
-        land_details_id,
+        available,
         city,
         room_type,
         description,
@@ -54,7 +54,7 @@ module.exports = class FlatModel {
         this.flat_videos = flat_videos;
         this.completion_status = completion_status;
         this.project_id = project_id;
-        this.land_details_id = land_details_id;
+        this.available = available;
         this.city = city;
         this.room_type = room_type;
         this.description = description;
@@ -71,8 +71,9 @@ module.exports = class FlatModel {
             } else {
                 this.id = flats.length + 1;
                 flats.push(this);
-                callback({ id: this.id });
             }
+
+            callback({ id: this.id });
 
             const updatedData = flats.map((flat) => [
                 flat.id,
@@ -92,7 +93,7 @@ module.exports = class FlatModel {
                 JSON.stringify(flat.flat_videos),
                 flat.completion_status,
                 flat.project_id,
-                flat.land_details_id,
+                flat.available,
                 flat.city,
                 flat.room_type,
                 flat.description,
@@ -154,7 +155,7 @@ module.exports = class FlatModel {
                               flat_videos: JSON.parse(row[14] || "[]"),
                               completion_status: row[15],
                               project_id: row[16],
-                              land_details_id: row[17],
+                              available: row[17],
                               city: row[18],
                               room_type: row[19],
                               description: row[20],
@@ -168,38 +169,6 @@ module.exports = class FlatModel {
         );
     }
 
-    // static async flatFindById(id, callback) {
-    //     FlatModel.getAllFlat((flats) => {
-    //         const flat = flats.find((flat) => flat.id === id) || null;
-    //         callback(flat);
-    //     });
-    // }
-
-    // static flatIdByProjectFloor(id, floor, callback) {
-    //     FlatModel.getAllFlat((flats) => {
-    //         const flat = flats.filter(
-    //             (flat) => flat.project_id == id && flat.floor == floor
-    //         );
-    //         const newData = [];
-
-    //         flat.forEach((el) =>
-    //             newData.push({ id: el.id, serial_no: el.serial_no })
-    //         );
-
-    //         callback(newData);
-    //     });
-    // }
-
-    // static async projectFindById(id) {
-    //     return new Promise((resolve, reject) => {
-    //         ProjectModel.getAllProjects((projects) => {
-    //             if (!projects) return reject(new Error("No projects found"));
-    //             const project = projects.find((p) => p.id === id) || null;
-    //             resolve(project);
-    //         });
-    //     });
-    // }
-
     static async flatFindById(id) {
         return new Promise((resolve, reject) => {
             FlatModel.getAllFlat((flats) => {
@@ -210,22 +179,6 @@ module.exports = class FlatModel {
             });
         });
     }
-
-    // static async flatIdByProjectFloor(id, floor) {
-    //     return new Promise((resolve, reject) => {
-    //         FlatModel.getAllFlat((flats) => {
-    //             if (!flats) return reject(new Error("No flats found"));
-
-    //             const newData = flats
-    //                 .filter(
-    //                     (flat) => flat.project_id == id && flat.floor == floor
-    //                 )
-    //                 .map(({ id, serial_no }) => ({ id, serial_no }));
-
-    //             resolve(newData);
-    //         });
-    //     });
-    // }
 
     static async flatIdByProjectFloor(id, floor) {
         return new Promise((resolve, reject) => {

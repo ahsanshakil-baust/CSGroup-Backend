@@ -39,10 +39,10 @@ const addLandDetails = (req, res, next) => {
         khariz_cost,
         other_cost,
         total_price,
-        project_id,
+        flat_id,
     } = req.body;
 
-    if (!project_id && !flat_id && !area) {
+    if (!flat_id && !area) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
@@ -58,7 +58,7 @@ const addLandDetails = (req, res, next) => {
             khariz_cost,
             other_cost,
             total_price,
-            project_id
+            flat_id
         );
 
         landDetails.save((data) => {
@@ -82,10 +82,10 @@ const updateLandDetails = (req, res, next) => {
         khariz_cost,
         other_cost,
         total_price,
-        project_id,
+        flat_id,
     } = req.body;
 
-    if (!id) {
+    if (!id && !flat_id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
@@ -101,7 +101,7 @@ const updateLandDetails = (req, res, next) => {
             khariz_cost,
             other_cost,
             total_price,
-            project_id
+            flat_id
         );
         land.id = id;
         land.save();

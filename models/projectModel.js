@@ -182,7 +182,7 @@ module.exports = class ProjectModel {
                 if (!projects) return reject(new Error("No projects found"));
 
                 const project =
-                    projects.find((project) => project.id === id) || null;
+                    projects.find((project) => project.id == id) || null;
                 resolve(project);
             });
         });
