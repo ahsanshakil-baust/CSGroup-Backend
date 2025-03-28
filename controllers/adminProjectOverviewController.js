@@ -66,7 +66,7 @@ const addProjectOverview = (req, res, next) => {
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const landDetails = new ProjectOverviewModel(
+        const overviewDetails = new ProjectOverviewModel(
             unit,
             floors,
             generator,
@@ -81,7 +81,7 @@ const addProjectOverview = (req, res, next) => {
             project_id
         );
 
-        landDetails.save((data) => {
+        overviewDetails.save((data) => {
             res.status(201).json({
                 data,
             });
@@ -126,10 +126,11 @@ const updateProjectOverview = (req, res, next) => {
             project_id
         );
         land.id = id;
-        land.save();
-        res.status(201).json({
-            msg: "Land Details updated successfully!",
-        });
+        land.save((data) =>
+            res.status(201).json({
+                data,
+            })
+        );
     }
 };
 
@@ -143,10 +144,11 @@ const deleteProjectOverview = (req, res, next) => {
         const land = new ProjectOverviewModel();
         land.id = id;
         land.status = 0;
-        land.save();
-        res.status(201).json({
-            msg: "Land deleted successfully!",
-        });
+        land.save((data) =>
+            res.status(201).json({
+                msg: "Land deleted successfully!",
+            })
+        );
     }
 };
 

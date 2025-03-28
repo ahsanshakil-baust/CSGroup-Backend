@@ -53,8 +53,8 @@ module.exports = class ProjectOverviewModel {
             } else {
                 this.id = overviews.length + 1;
                 overviews.push(this);
-                callback({ id: this.id });
             }
+            callback({ id: this.id });
 
             const updatedData = overviews.map((el) => [
                 el.id,

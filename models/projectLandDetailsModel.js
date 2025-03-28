@@ -37,8 +37,8 @@ module.exports = class ProjectLandDetailsModel {
             } else {
                 this.id = pLands.length + 1;
                 pLands.push(this);
-                callback({ id: this.id });
             }
+            callback({ id: this.id });
 
             const updatedData = pLands.map((el) => [
                 el.id,

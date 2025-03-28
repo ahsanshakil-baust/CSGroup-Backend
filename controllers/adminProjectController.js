@@ -176,10 +176,11 @@ const deleteProject = (req, res, next) => {
         const project = new ProjectModel();
         project.id = id;
         project.status = 0;
-        project.save();
-        res.status(201).json({
-            msg: "Project deleted successfully!",
-        });
+        project.save((data) =>
+            res.status(201).json({
+                msg: "Project deleted successfully!",
+            })
+        );
     }
 };
 

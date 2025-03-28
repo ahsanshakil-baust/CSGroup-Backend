@@ -81,7 +81,7 @@ const updateOwner = (req, res, next) => {
         flat_id,
     } = req.body;
 
-    if (!id || !name) {
+    if (!id || !flat_id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });

@@ -49,11 +49,11 @@ module.exports = class FlatLandDetailsModel {
             } else {
                 this.id = lands.length + 1;
                 lands.push(this);
-                callback({
-                    id: this.id,
-                    flat_id: parseInt(this.flat_id),
-                });
             }
+            callback({
+                id: this.id,
+                flat_id: parseInt(this.flat_id),
+            });
 
             const updatedData = lands.map((land) => [
                 land.id,
@@ -143,14 +143,14 @@ module.exports = class FlatLandDetailsModel {
     //     });
     // }
 
-    static async landFindById(id) {
+    static async landFindById(flat_id) {
         return new Promise((resolve, reject) => {
             FlatLandDetailsModel.getAllLandDetails((lands) => {
                 if (!lands) return reject(new Error("No land details found"));
 
                 const land =
                     lands.find(
-                        (land) => parseInt(land.flat_id) === parseInt(id)
+                        (land) => parseInt(land.flat_id) === parseInt(flat_id)
                     ) || null;
 
                 resolve(land);

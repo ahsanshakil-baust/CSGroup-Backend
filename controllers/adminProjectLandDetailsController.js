@@ -86,10 +86,14 @@ const updateProjectLandDetails = (req, res, next) => {
             project_id
         );
         land.id = id;
-        land.save();
-        res.status(201).json({
-            msg: "Land Details updated successfully!",
-        });
+        land.save((data) =>
+            res.status(201).json({
+                data,
+            })
+        );
+        // res.status(201).json({
+        //     msg: "Land Details updated successfully!",
+        // });
     }
 };
 
@@ -103,10 +107,11 @@ const deleteProjectLandDetails = (req, res, next) => {
         const land = new ProjectLandDetailsModel();
         land.id = id;
         land.status = 0;
-        land.save();
-        res.status(201).json({
-            msg: "Land deleted successfully!",
-        });
+        land.save((data) =>
+            res.status(201).json({
+                msg: "Land deleted successfully!",
+            })
+        );
     }
 };
 

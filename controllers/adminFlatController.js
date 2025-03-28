@@ -119,21 +119,13 @@ const addFlat = (req, res, next) => {
         flat_videos,
         completion_status,
         project_id,
-        land_details_id,
+        available,
         city,
         room_type,
         description,
         serial_no,
     } = req.body;
-    if (
-        !type &&
-        !flat_number &&
-        !floor &&
-        !address &&
-        !direction &&
-        !land_details_id &&
-        !project_id
-    ) {
+    if (!type && !flat_number && !floor && serial_no && !project_id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
@@ -155,7 +147,7 @@ const addFlat = (req, res, next) => {
             flat_videos,
             completion_status,
             project_id,
-            land_details_id,
+            available,
             city,
             room_type,
             description,
@@ -189,7 +181,7 @@ const updateFlat = (req, res, next) => {
         flat_videos,
         completion_status,
         project_id,
-        land_details_id,
+        available,
         city,
         room_type,
         description,
@@ -218,16 +210,17 @@ const updateFlat = (req, res, next) => {
             flat_videos,
             completion_status,
             project_id,
-            land_details_id,
+            available,
             city,
             room_type,
             description,
             serial_no
         );
         flat.id = id;
-        flat.save();
-        res.status(201).json({
-            msg: "Flat updated successfully!",
+        flat.save((data) => {
+            res.status(201).json({
+                data,
+            });
         });
     }
 };
@@ -242,10 +235,11 @@ const deleteFlat = (req, res, next) => {
         const flat = new FlatModel();
         flat.id = id;
         flat.status = 0;
-        flat.save();
-        res.status(201).json({
-            msg: "Flat deleted successfully!",
-        });
+        flat.save((data) =>
+            res.status(201).json({
+                msg: "Flat deleted successfully!",
+            })
+        );
     }
 };
 

@@ -9,18 +9,15 @@ const getAllLandDetails = (req, res, next) => {
 
 const getLandDetails = async (req, res, next) => {
     try {
-        const { id, project_id } = req.body;
-        if (!id) {
+        const { flat_id } = req.params;
+        if (!flat_id) {
             return res.status(400).json({ error: "Need To Pass Id." });
         }
 
         // Fetch land details
-        const landDetails = await FlatLandDetailsModel.landFindById(
-            id,
-            project_id
-        );
+        const landDetails = await FlatLandDetailsModel.landFindById(flat_id);
 
-        return res.status(200).json({ landDetails });
+        return res.status(200).json({ data: landDetails });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal Server Error." });
@@ -104,9 +101,10 @@ const updateLandDetails = (req, res, next) => {
             flat_id
         );
         land.id = id;
-        land.save();
-        res.status(201).json({
-            msg: "Land Details updated successfully!",
+        land.save((data) => {
+            res.status(201).json({
+                data,
+            });
         });
     }
 };
@@ -121,10 +119,11 @@ const deleteLandDetails = (req, res, next) => {
         const land = new FlatLandDetailsModel();
         land.id = id;
         land.status = 0;
-        land.save();
-        res.status(201).json({
-            msg: "Land deleted successfully!",
-        });
+        land.save((data) =>
+            res.status(201).json({
+                msg: "Land deleted successfully!",
+            })
+        );
     }
 };
 

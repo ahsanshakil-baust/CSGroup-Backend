@@ -13,6 +13,6 @@ router.post("/add", authurization, addLandDetails);
 router.post("/update", authurization, updateLandDetails);
 router.post("/delete", authurization, deleteLandDetails);
 router.get("/all", getAllLandDetails);
-router.get("/", getLandDetails);
+router.get("/:flat_id", getLandDetails);
 
 module.exports = router;
