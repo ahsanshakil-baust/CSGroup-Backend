@@ -15,6 +15,9 @@ const landRouter = require("./routes/adminLandDetailsRouter");
 const projectLandRouter = require("./routes/adminProjectLandRouter");
 const projectFacilitiesRouter = require("./routes/adminProjectFacilitiesRouter");
 const projectOverviewRouter = require("./routes/adminProjectOverviewRouter");
+const shareRouter = require("./routes/adminShareRouter");
+const shareLandRouter = require("./routes/adminShareLandRouter");
+const shareFlatRouter = require("./routes/adminShareFlatRouter");
 
 const app = express();
 
@@ -23,13 +26,6 @@ const port = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
-
-// const corsOptions = {
-//   origin: "http://localhost:3000",
-//   methods: "GET,POST,PUT,DELETE",
-//   allowedHeaders: "Content-Type,Authorization",
-//   credentials: true,
-// };
 
 const allowedOrigins = [
     "http://localhost:3000",
@@ -64,6 +60,9 @@ app.use("/admin/land-details", landRouter);
 app.use("/admin/project-land-details", projectLandRouter);
 app.use("/admin/project-facilities", projectFacilitiesRouter);
 app.use("/admin/project-overview", projectOverviewRouter);
+app.use("/admin/share", shareRouter);
+app.use("/admin/share-land-details", shareLandRouter);
+app.use("/admin/share-flat", shareFlatRouter);
 app.use("/", clientRouter);
 
 // Global Error Handling Middleware

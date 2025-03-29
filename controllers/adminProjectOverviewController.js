@@ -7,22 +7,6 @@ const getAllProjectOverview = (req, res, next) => {
     });
 };
 
-// const getProjectOverview = (req, res, next) => {
-//     const { id } = req.params;
-//     console.log(id);
-
-//     if (!id) {
-//         res.status(500).json({
-//             error: "Need To Pass Id.",
-//         });
-//     } else {
-//         ProjectOverviewModel.overviewFindById(parseInt(id), (data) => {
-//             const newData = data.filter((el) => el.status != 0);
-//             res.status(200).json({ data });
-//         });
-//     }
-// };
-
 const getProjectOverview = async (req, res, next) => {
     try {
         const { id } = req.params;
