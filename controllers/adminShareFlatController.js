@@ -41,7 +41,7 @@ const addShareFlat = (req, res, next) => {
         share_id,
     } = req.body;
 
-    if (!project_id) {
+    if (!share_id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
@@ -84,7 +84,7 @@ const updateShareFlat = (req, res, next) => {
         share_id,
     } = req.body;
 
-    if (!id) {
+    if (!id && !share_id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });

@@ -130,19 +130,6 @@ module.exports = class FlatLandDetailsModel {
         );
     }
 
-    // static async landFindById(id, flat_id, callback) {
-    //     FlatLandDetailsModel.getAllLandDetails((lands) => {
-    //         const land =
-    //             lands.find(
-    //                 (land) =>
-    //                     parseInt(land.id) === id &&
-    //                     parseInt(land.flat_id) === flat_id
-    //             ) || null;
-
-    //         callback(land);
-    //     });
-    // }
-
     static async landFindById(flat_id) {
         return new Promise((resolve, reject) => {
             FlatLandDetailsModel.getAllLandDetails((lands) => {

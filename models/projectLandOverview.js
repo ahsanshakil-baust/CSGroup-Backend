@@ -23,7 +23,7 @@ module.exports = class ProjectOverviewModel {
         stair,
         cctv,
         security_guard,
-        others_facilities = [],
+        others_facilities,
         project_id,
         status = 1,
         id = 0

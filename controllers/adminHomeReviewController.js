@@ -34,11 +34,13 @@ const updateReview = (req, res, next) => {
 };
 
 const getAllReviews = (req, res, next) => {
-    HomeClientReview.getAllReview((data) =>
+    HomeClientReview.getAllReview((data) => {
+        const newDate = data.filter((el) => el.status != 0);
+
         res.status(200).json({
-            data,
-        })
-    );
+            data: newDate,
+        });
+    });
 };
 
 const getReview = (req, res, next) => {
@@ -63,11 +65,6 @@ const deleteReview = (req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-        // HomeClientReview.deleteById(id, (err) => {
-        //   if (err) res.status(500).json({ error: "Can't delete" });
-        //   else res.status(200).json({ msg: "Deleted successfully!" });
-        // });
-
         const review = new HomeClientReview();
         review.id = id;
         review.status = 0;

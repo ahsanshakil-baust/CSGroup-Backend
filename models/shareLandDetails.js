@@ -137,7 +137,7 @@ module.exports = class ShareLandDetailsModel {
 
                 const land =
                     lands.find(
-                        (land) => parseInt(land.share_id) === parseInt(share_id)
+                        (land) => parseInt(land.share_id) == parseInt(share_id)
                     ) || null;
 
                 resolve(land);

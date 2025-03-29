@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "1aRIHJ4Uq5ru0eu_smvEv0YnR50jNhDeEDIsnNtRRKSw";
-const range = "Sheet1!A:J";
+const range = "Sheet1!A:I";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -14,11 +14,11 @@ const sheets = google.sheets({ version: "v4", auth });
 module.exports = class ShareModel {
     constructor(
         name,
-        project_type,
+        // project_type,
         location,
         description,
-        share_videos = [],
-        project_images = [],
+        share_videos,
+        project_images,
         map_url,
         project_structure,
         id = 0,
@@ -26,7 +26,7 @@ module.exports = class ShareModel {
     ) {
         this.id = id;
         this.name = name;
-        this.project_type = project_type;
+        // this.project_type = project_type;
         this.location = location;
         this.description = description;
         this.share_videos = share_videos;
@@ -53,7 +53,7 @@ module.exports = class ShareModel {
             const updatedData = projects.map((project) => [
                 project.id,
                 project.name,
-                project.project_type,
+                // project.project_type,
                 project.location,
                 project.description,
                 JSON.stringify(project.share_videos),
@@ -109,14 +109,14 @@ module.exports = class ShareModel {
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
                               name: row[1],
-                              project_type: row[2],
-                              location: row[3],
-                              description: row[4],
-                              share_videos: JSON.parse(row[5] || "[]"),
-                              project_images: JSON.parse(row[6] || "[]"),
-                              map_url: row[7],
-                              project_structure: row[8],
-                              status: parseInt(row[9]),
+                              //   project_type: row[2],
+                              location: row[2],
+                              description: row[3],
+                              share_videos: JSON.parse(row[4] || "[]"),
+                              project_images: JSON.parse(row[5] || "[]"),
+                              map_url: row[6],
+                              project_structure: row[7],
+                              status: parseInt(row[8]),
                           }))
                         : [];
 

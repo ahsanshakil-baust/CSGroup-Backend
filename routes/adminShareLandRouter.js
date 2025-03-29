@@ -15,6 +15,6 @@ router.post("/add", authurization, addShareLandDetails);
 router.post("/update", authurization, updateShareLandDetails);
 router.post("/delete", authurization, deleteShareLandDetails);
 router.get("/all", getAllShareLandDetails);
-router.get("/:flat_id", getShareLandDetails);
+router.get("/:id", getShareLandDetails);
 
 module.exports = router;

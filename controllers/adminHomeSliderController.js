@@ -62,11 +62,6 @@ const deleteSlider = (req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-        // HomeSliders.deleteById(id, (err) => {
-        //     if (err) res.status(500).json({ error: "Can't delete" });
-        //     else res.status(200).json({ msg: "Deleted successfully!" });
-        // });
-
         const slider = new HomeSliders();
         slider.id = id;
         slider.status = 0;

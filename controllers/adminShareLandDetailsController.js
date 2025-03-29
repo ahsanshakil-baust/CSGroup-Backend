@@ -9,13 +9,13 @@ const getAllShareLandDetails = (req, res, next) => {
 
 const getShareLandDetails = async (req, res, next) => {
     try {
-        const { share_id } = req.params;
-        if (!share_id) {
+        const { id } = req.params;
+        if (!id) {
             return res.status(400).json({ error: "Need To Pass Id." });
         }
 
         // Fetch land details
-        const landDetails = await ShareLandDetailsModel.landFindById(share_id);
+        const landDetails = await ShareLandDetailsModel.landFindById(id);
 
         return res.status(200).json({ data: landDetails });
     } catch (error) {

@@ -24,10 +24,7 @@ const getAllFlats = async (req, res, next) => {
         // Fetch land details and project details in parallel
         const flatDetailsPromises = filteredFlats.map(async (el) => {
             const [landDetails, project] = await Promise.all([
-                FlatLandDetailsModel.landFindById(
-                    el.land_details_id,
-                    el.project_id
-                ),
+                FlatLandDetailsModel.landFindById(el.id),
                 ProjectModel.projectFindById(el.project_id),
             ]);
 
@@ -66,10 +63,7 @@ const getFlatDetails = async (req, res, next) => {
                 console.error("Owner fetch error:", err);
                 return null;
             }),
-            FlatLandDetailsModel.landFindById(
-                flat.land_details_id,
-                flat.project_id
-            ).catch((err) => {
+            FlatLandDetailsModel.landFindById(flat.id).catch((err) => {
                 console.error("Land details fetch error:", err);
                 return null;
             }),

@@ -40,7 +40,7 @@ const getShare = async (req, res, next) => {
 const addShare = (req, res, next) => {
     const {
         name,
-        project_type,
+        // project_type,
         location,
         description,
         share_videos,
@@ -55,7 +55,7 @@ const addShare = (req, res, next) => {
     } else {
         const share = new ShareModel(
             name,
-            project_type,
+            // project_type,
             location,
             description,
             share_videos,
@@ -75,7 +75,7 @@ const updateShare = (req, res, next) => {
     const {
         id,
         name,
-        project_type,
+        // project_type,
         location,
         description,
         share_videos,
@@ -91,7 +91,7 @@ const updateShare = (req, res, next) => {
     } else {
         const share = new ShareModel(
             name,
-            project_type,
+            // project_type,
             location,
             description,
             share_videos,
