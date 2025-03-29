@@ -5,7 +5,23 @@ const ShareModel = require("../models/shareModel");
 const getAllShares = async (req, res, next) => {
     ShareModel.getAllShares(async (data) => {
         const newData = data.filter((el) => el.status != 0);
-        res.status(200).json({ data: newData });
+
+        // Fetch land details and project details in parallel
+        const flatDetailsPromises = newData.map(async (el) => {
+            const [landDetails] = await Promise.all([
+                ShareLandDetailsModel.landFindById(el.id),
+            ]);
+
+            return {
+                ...el,
+                land_details: landDetails || {},
+            };
+        });
+
+        // Wait for all promises to resolve
+        const updatedFlats = await Promise.all(flatDetailsPromises);
+
+        res.status(200).json({ data: updatedFlats });
     });
 };
 
@@ -47,6 +63,8 @@ const addShare = (req, res, next) => {
         project_images,
         map_url,
         project_structure,
+        city,
+        available,
     } = req.body;
     if (name == "") {
         res.status(500).json({
@@ -61,7 +79,9 @@ const addShare = (req, res, next) => {
             share_videos,
             project_images,
             map_url,
-            project_structure
+            project_structure,
+            city,
+            available
         );
         share.save((id) =>
             res.status(201).json({
@@ -82,6 +102,8 @@ const updateShare = (req, res, next) => {
         project_images,
         map_url,
         project_structure,
+        city,
+        available,
     } = req.body;
 
     if (!id) {
@@ -97,7 +119,9 @@ const updateShare = (req, res, next) => {
             share_videos,
             project_images,
             map_url,
-            project_structure
+            project_structure,
+            city,
+            available
         );
         share.id = id;
         share.save((id) =>

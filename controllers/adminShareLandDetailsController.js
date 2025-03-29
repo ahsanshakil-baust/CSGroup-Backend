@@ -37,6 +37,8 @@ const addShareLandDetails = (req, res, next) => {
         other_cost,
         total_price,
         share_id,
+        total_floor,
+        total_flat,
     } = req.body;
 
     if (!share_id && !area) {
@@ -55,7 +57,9 @@ const addShareLandDetails = (req, res, next) => {
             khariz_cost,
             other_cost,
             total_price,
-            share_id
+            share_id,
+            total_floor,
+            total_flat
         );
 
         landDetails.save((data) => {
@@ -80,6 +84,8 @@ const updateShareLandDetails = (req, res, next) => {
         other_cost,
         total_price,
         share_id,
+        total_floor,
+        total_flat,
     } = req.body;
 
     if (!id && !share_id) {
@@ -98,7 +104,9 @@ const updateShareLandDetails = (req, res, next) => {
             khariz_cost,
             other_cost,
             total_price,
-            share_id
+            share_id,
+            total_floor,
+            total_flat
         );
         land.id = id;
         land.save((data) => {

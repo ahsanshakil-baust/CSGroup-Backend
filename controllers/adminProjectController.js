@@ -6,7 +6,21 @@ const ProjectModel = require("../models/projectModel");
 const getAllProject = async (req, res, next) => {
     ProjectModel.getAllProjects(async (data) => {
         const newData = data.filter((el) => el.status != 0);
-        res.status(200).json({ data: newData });
+
+        const projectData = newData.map(async (el) => {
+            const [overview] = await Promise.all([
+                ProjectOverviewModel.overviewFindById(el.id),
+            ]);
+
+            return {
+                ...el,
+                overview: overview || {},
+            };
+        });
+
+        const updatedProjects = await Promise.all(projectData);
+
+        res.status(200).json({ data: updatedProjects });
     });
 };
 
@@ -66,6 +80,9 @@ const addProject = (req, res, next) => {
         project_images,
         map_url,
         project_structure,
+        city,
+        available,
+        category,
     } = req.body;
     if (name == "") {
         res.status(500).json({
@@ -80,7 +97,10 @@ const addProject = (req, res, next) => {
             land_videos,
             project_images,
             map_url,
-            project_structure
+            project_structure,
+            city,
+            available,
+            category
         );
         project.save((id) =>
             res.status(201).json({
@@ -101,6 +121,9 @@ const updateProject = (req, res, next) => {
         project_images,
         map_url,
         project_structure,
+        city,
+        available,
+        category,
     } = req.body;
 
     if (!id) {
@@ -116,7 +139,10 @@ const updateProject = (req, res, next) => {
             land_videos,
             project_images,
             map_url,
-            project_structure
+            project_structure,
+            city,
+            available,
+            category
         );
         project.id = id;
         project.save((id) =>

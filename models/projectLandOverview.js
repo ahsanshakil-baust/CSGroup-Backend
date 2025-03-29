@@ -132,16 +132,6 @@ module.exports = class ProjectOverviewModel {
         );
     }
 
-    // static async overviewFindById(id, callback) {
-    //     ProjectOverviewModel.getAllOverview((overviews) => {
-    //         const el =
-    //             overviews.find(
-    //                 (el) => parseInt(el.project_id) == parseInt(id)
-    //             ) || null;
-    //         callback(el);
-    //     });
-    // }
-
     static async overviewFindById(id) {
         return new Promise((resolve, reject) => {
             ProjectOverviewModel.getAllOverview((overviews) => {
@@ -150,7 +140,7 @@ module.exports = class ProjectOverviewModel {
 
                 const el =
                     overviews.find(
-                        (el) => parseInt(el.project_id) === parseInt(id)
+                        (el) => parseInt(el.project_id) == parseInt(id)
                     ) || null;
                 resolve(el);
             });

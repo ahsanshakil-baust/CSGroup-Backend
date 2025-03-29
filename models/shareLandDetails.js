@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "1C7rK7q5TSl7vc1kzuFORZOVK8XF5op19Uj8CLq_aSP4";
-const range = "Sheet1!A:N";
+const range = "Sheet1!A:O";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -24,6 +24,8 @@ module.exports = class ShareLandDetailsModel {
         other_cost,
         total_price,
         share_id,
+        total_floor,
+        total_flat,
         id = 0,
         status = 1
     ) {
@@ -39,6 +41,8 @@ module.exports = class ShareLandDetailsModel {
         this.other_cost = other_cost;
         this.total_price = total_price;
         this.share_id = share_id;
+        this.total_floor = total_floor;
+        this.total_flat = total_flat;
         this.status = status;
     }
 
@@ -68,6 +72,8 @@ module.exports = class ShareLandDetailsModel {
                 land.other_cost,
                 land.total_price,
                 land.share_id,
+                land.total_floor,
+                land.total_flat,
                 land.status,
             ]);
 
@@ -120,7 +126,9 @@ module.exports = class ShareLandDetailsModel {
                               other_cost: row[9],
                               total_price: row[10],
                               share_id: row[11],
-                              status: parseInt(row[12], 10),
+                              total_floor: row[12],
+                              total_flat: row[13],
+                              status: parseInt(row[14], 10),
                           }))
                         : [];
 

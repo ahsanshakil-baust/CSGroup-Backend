@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
 const sheetId = "15tL2aXEHssjjUF4MwwrmK6EaSviKfq28Pq_TWKn4sjc";
-const range = "Sheet1!A:J";
+const range = "Sheet1!A:M";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -21,6 +21,9 @@ module.exports = class ProjectModel {
         project_images,
         map_url,
         project_structure,
+        city,
+        available,
+        category,
         id = 0,
         status = 1
     ) {
@@ -33,6 +36,9 @@ module.exports = class ProjectModel {
         this.project_images = project_images;
         this.map_url = map_url;
         this.project_structure = project_structure;
+        this.city = city;
+        this.available = available;
+        this.category = category;
         this.status = status;
     }
 
@@ -60,6 +66,9 @@ module.exports = class ProjectModel {
                 JSON.stringify(project.project_images),
                 project.map_url,
                 project.project_structure,
+                project.city,
+                project.available,
+                project.category,
                 project.status,
             ]);
 
@@ -116,7 +125,10 @@ module.exports = class ProjectModel {
                               project_images: JSON.parse(row[6] || "[]"),
                               map_url: row[7],
                               project_structure: row[8],
-                              status: parseInt(row[9]),
+                              city: row[9],
+                              available: row[10],
+                              category: row[11],
+                              status: parseInt(row[12]),
                           }))
                         : [];
 
