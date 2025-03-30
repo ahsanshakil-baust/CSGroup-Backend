@@ -18,6 +18,11 @@ const {
     getAllShares,
     getShare,
 } = require("../controllers/adminShareController");
+const { getAllNotice } = require("../controllers/adminNoticeController");
+const {
+    getAllEvent,
+    getEventReels,
+} = require("../controllers/adminEventController");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
@@ -28,5 +33,8 @@ router.get("/project/all", getAllProject);
 router.get("/project/:id", getProject);
 router.get("/share/all", getAllShares);
 router.get("/share/:id", getShare);
+router.get("/notice/all", getAllNotice);
+router.get("/event/all", getAllEvent);
+router.get("/event/reels", getEventReels);
 
 module.exports = router;

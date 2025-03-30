@@ -1,11 +1,11 @@
 const express = require("express");
 const authurization = require("../middlewares/authorization");
 const {
-  addClientReview,
-  updateReview,
-  getAllReviews,
-  getReview,
-  deleteReview,
+    addClientReview,
+    updateReview,
+    getAllReviews,
+    getReview,
+    deleteReview,
 } = require("../controllers/adminHomeReviewController");
 
 const router = express.Router();
