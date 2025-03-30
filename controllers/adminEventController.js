@@ -50,7 +50,7 @@ const getEventReels = (req, res, next) => {
         const newData = data.filter((el) => el.status != 0);
 
         newData.forEach((el) => {
-            const rand = randomTook(newData.length);
+            const rand = randomTook(el.images.length - 1);
             arr.push(el.images[rand]);
         });
 
