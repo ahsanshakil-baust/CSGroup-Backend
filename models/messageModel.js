@@ -1,0 +1,101 @@
+const { google } = require("googleapis");
+
+const credentials = require("./credentials2.json");
+const sheetId = "1S45i6fRkh_amvzlRdKBLx44bfrcmo5pgsvVXOEsuFWI";
+const range = "Sheet1!A:F";
+
+const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
+module.exports = class MessageModel {
+    constructor(name, url, designation, message, status = 1, id = 0) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+        this.designation = designation;
+        this.message = message;
+        this.status = status;
+    }
+
+    save() {
+        MessageModel.getAllMessage((data) => {
+            if (this.id > 0) {
+                data = data.map((el) => (el.id == this.id ? this : el));
+            } else {
+                this.id = data.length + 1;
+                data.push(this);
+            }
+
+            const updatedData = data.map((el) => [
+                el.id,
+                el.name,
+                el.url,
+                el.designation,
+                el.message,
+                el.status,
+            ]);
+
+            sheets.spreadsheets.values.update(
+                {
+                    spreadsheetId: sheetId,
+                    range: range,
+                    valueInputOption: "RAW",
+                    requestBody: {
+                        values: updatedData,
+                    },
+                },
+                (err, res) => {
+                    if (err) {
+                        console.error(
+                            "Error saving data to Google Sheets:",
+                            err
+                        );
+                    } else {
+                        console.log(
+                            "Message saved successfully to Google Sheets!"
+                        );
+                    }
+                }
+            );
+        });
+    }
+
+    static getAllMessage(callback) {
+        sheets.spreadsheets.values.get(
+            {
+                spreadsheetId: sheetId,
+                range: range,
+            },
+            (err, res) => {
+                if (err) {
+                    console.error("Error reading from Google Sheets:", err);
+                    callback([]);
+                } else {
+                    const rows = res.data.values;
+                    const notice = rows
+                        ? rows.map((row) => ({
+                              id: parseInt(row[0], 10),
+                              name: row[1],
+                              url: row[2],
+                              designation: row[3],
+                              message: row[4],
+                              status: parseInt(row[5]),
+                          }))
+                        : [];
+                    callback(notice);
+                }
+            }
+        );
+    }
+
+    static messageFindById(id, callback) {
+        MessageModel.getAllMessage((notices) => {
+            const el = notices.find((el) => el.id === id);
+            callback(el);
+        });
+    }
+};

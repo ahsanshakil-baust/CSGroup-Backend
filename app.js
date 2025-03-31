@@ -20,6 +20,7 @@ const shareLandRouter = require("./routes/adminShareLandRouter");
 const shareFlatRouter = require("./routes/adminShareFlatRouter");
 const noticeRouter = require("./routes/adminNoticeRouter");
 const eventRouter = require("./routes/adminEventRouter");
+const messageRouter = require("./routes/adminMessageRouter");
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use("/admin/share-land-details", shareLandRouter);
 app.use("/admin/share-flat", shareFlatRouter);
 app.use("/admin/notice", noticeRouter);
 app.use("/admin/event", eventRouter);
+app.use("/admin/message", messageRouter);
 app.use("/", clientRouter);
 
 app.use((err, req, res, next) => {
