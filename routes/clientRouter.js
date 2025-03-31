@@ -24,6 +24,9 @@ const {
     getEventReels,
 } = require("../controllers/adminEventController");
 const { getAllMessage } = require("../controllers/adminMessageController");
+const {
+    getAllTeamMember,
+} = require("../controllers/adminTeamMemberController");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
@@ -38,5 +41,6 @@ router.get("/notice/all", getAllNotice);
 router.get("/event/all", getAllEvent);
 router.get("/event/reels", getEventReels);
 router.get("/message/all", getAllMessage);
+router.get("/team/all", getAllTeamMember);
 
 module.exports = router;

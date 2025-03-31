@@ -21,6 +21,7 @@ const shareFlatRouter = require("./routes/adminShareFlatRouter");
 const noticeRouter = require("./routes/adminNoticeRouter");
 const eventRouter = require("./routes/adminEventRouter");
 const messageRouter = require("./routes/adminMessageRouter");
+const teamMemberRouter = require("./routes/adminTeamMemberRouter");
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use("/admin/share-flat", shareFlatRouter);
 app.use("/admin/notice", noticeRouter);
 app.use("/admin/event", eventRouter);
 app.use("/admin/message", messageRouter);
+app.use("/admin/team", teamMemberRouter);
 app.use("/", clientRouter);
 
 app.use((err, req, res, next) => {
