@@ -87,9 +87,17 @@ const userLogin = async (req, res, next) => {
     });
 };
 
+const checkLogin = (req, res, next) => {
+    const { email } = req.user;
+
+    if (email) res.send("1");
+    else res.send("0");
+};
+
 module.exports = {
     getAllUser,
     getUserByEmail,
     addUser,
     userLogin,
+    checkLogin,
 };

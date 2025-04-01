@@ -30,6 +30,7 @@ const {
 const {
     getAllCertificate,
 } = require("../controllers/adminCertificateController");
+const { getContact } = require("../controllers/adminContactController");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
@@ -46,5 +47,6 @@ router.get("/event/reels", getEventReels);
 router.get("/message/all", getAllMessage);
 router.get("/team/all", getAllTeamMember);
 router.get("/certificate/all", getAllCertificate);
+router.get("/contact", getContact);
 
 module.exports = router;

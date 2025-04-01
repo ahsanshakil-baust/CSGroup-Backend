@@ -52,7 +52,7 @@ const getCertificate = (req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-        CertificateModel.CertificateFindById(convertedId, (data) => {
+        CertificateModel.certificateFindById(convertedId, (data) => {
             res.status(200).json({ data });
         });
     }

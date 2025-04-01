@@ -82,8 +82,8 @@ module.exports = class CertificateModel {
                               title: row[1],
                               where: row[2],
                               url: row[3],
-                              date: row[5],
-                              status: parseInt(row[6]),
+                              date: row[4],
+                              status: parseInt(row[5]),
                           }))
                         : [];
                     callback(event);

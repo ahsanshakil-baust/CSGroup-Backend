@@ -23,6 +23,7 @@ const eventRouter = require("./routes/adminEventRouter");
 const messageRouter = require("./routes/adminMessageRouter");
 const teamMemberRouter = require("./routes/adminTeamMemberRouter");
 const certificateRouter = require("./routes/adminCertificateRouter");
+const contactRouter = require("./routes/adminContactRouter");
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use("/admin/event", eventRouter);
 app.use("/admin/message", messageRouter);
 app.use("/admin/team", teamMemberRouter);
 app.use("/admin/certificate", certificateRouter);
+app.use("/admin/contact", contactRouter);
 app.use("/", clientRouter);
 
 app.use((err, req, res, next) => {
