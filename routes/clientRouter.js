@@ -31,6 +31,10 @@ const {
     getAllCertificate,
 } = require("../controllers/adminCertificateController");
 const { getContact } = require("../controllers/adminContactController");
+const {
+    getAllPortfolio,
+    getPortfolio,
+} = require("../controllers/adminPortfolioController");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
@@ -48,5 +52,7 @@ router.get("/message/all", getAllMessage);
 router.get("/team/all", getAllTeamMember);
 router.get("/certificate/all", getAllCertificate);
 router.get("/contact", getContact);
+router.get("/portfolio/all", getAllPortfolio);
+router.get("/portfolio/:id", getPortfolio);
 
 module.exports = router;

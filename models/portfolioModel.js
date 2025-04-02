@@ -1,0 +1,116 @@
+const { google } = require("googleapis");
+
+const credentials = require("./credentials2.json");
+const sheetId = "1JEAzgRDOGvjGG7dLe2esOnVQwJ-3cp8mKKST9skYjyQ";
+const range = "Sheet1!A:H";
+
+const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
+module.exports = class PortfolioModel {
+    constructor(
+        name,
+        profession,
+        url,
+        email,
+        phone,
+        about,
+        status = 1,
+        id = 0
+    ) {
+        this.id = id;
+        this.name = name;
+        this.profession = profession;
+        this.phone = phone;
+        this.url = url;
+        this.email = email;
+        this.about = about;
+        this.status = status;
+    }
+
+    save() {
+        PortfolioModel.getAllPortfolio((data) => {
+            if (this.id > 0) {
+                data = data.map((el) => (el.id == this.id ? this : el));
+            } else {
+                this.id = data.length + 1;
+                data.push(this);
+            }
+
+            const updatedData = data.map((el) => [
+                el.id,
+                el.name,
+                el.profession,
+                el.phone,
+                el.url,
+                el.email,
+                el.about,
+                el.status,
+            ]);
+
+            sheets.spreadsheets.values.update(
+                {
+                    spreadsheetId: sheetId,
+                    range: range,
+                    valueInputOption: "RAW",
+                    requestBody: {
+                        values: updatedData,
+                    },
+                },
+                (err, res) => {
+                    if (err) {
+                        console.error(
+                            "Error saving data to Google Sheets:",
+                            err
+                        );
+                    } else {
+                        console.log(
+                            "Certificate saved successfully to Google Sheets!"
+                        );
+                    }
+                }
+            );
+        });
+    }
+
+    static getAllPortfolio(callback) {
+        sheets.spreadsheets.values.get(
+            {
+                spreadsheetId: sheetId,
+                range: range,
+            },
+            (err, res) => {
+                if (err) {
+                    console.error("Error reading from Google Sheets:", err);
+                    callback([]);
+                } else {
+                    const rows = res.data.values;
+                    const event = rows
+                        ? rows.map((row) => ({
+                              id: parseInt(row[0], 10),
+                              name: row[1],
+                              profession: row[2],
+                              phone: row[3],
+                              url: row[4],
+                              email: row[5],
+                              about: row[6],
+                              status: parseInt(row[7]),
+                          }))
+                        : [];
+                    callback(event);
+                }
+            }
+        );
+    }
+
+    static portfolioFindById(id, callback) {
+        PortfolioModel.getAllPortfolio((events) => {
+            const el = events.find((el) => el.id === id);
+            callback(el);
+        });
+    }
+};

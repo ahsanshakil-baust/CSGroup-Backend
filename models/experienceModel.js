@@ -1,0 +1,112 @@
+const { google } = require("googleapis");
+
+const credentials = require("./credentials2.json");
+const sheetId = "11Rsh-KY4cwVrL1o1HhGta-efH-Hh26csDiVLktXPQHc";
+const range = "Sheet1!A:G";
+
+const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
+module.exports = class ExperienceModel {
+    constructor(
+        title,
+        profession,
+        about,
+        date_duration,
+        portfolio_id,
+        status = 1,
+        id = 0
+    ) {
+        this.id = id;
+        this.title = title;
+        this.profession = profession;
+        this.about = about;
+        this.date_duration = date_duration;
+        this.portfolio_id = portfolio_id;
+        this.status = status;
+    }
+
+    save() {
+        ExperienceModel.getAllExperience((data) => {
+            if (this.id > 0) {
+                data = data.map((el) => (el.id == this.id ? this : el));
+            } else {
+                this.id = data.length + 1;
+                data.push(this);
+            }
+
+            const updatedData = data.map((el) => [
+                el.id,
+                el.title,
+                el.profession,
+                el.about,
+                el.date_duration,
+                el.portfolio_id,
+                el.status,
+            ]);
+
+            sheets.spreadsheets.values.update(
+                {
+                    spreadsheetId: sheetId,
+                    range: range,
+                    valueInputOption: "RAW",
+                    requestBody: {
+                        values: updatedData,
+                    },
+                },
+                (err, res) => {
+                    if (err) {
+                        console.error(
+                            "Error saving data to Google Sheets:",
+                            err
+                        );
+                    } else {
+                        console.log(
+                            "Certificate saved successfully to Google Sheets!"
+                        );
+                    }
+                }
+            );
+        });
+    }
+
+    static getAllExperience(callback) {
+        sheets.spreadsheets.values.get(
+            {
+                spreadsheetId: sheetId,
+                range: range,
+            },
+            (err, res) => {
+                if (err) {
+                    console.error("Error reading from Google Sheets:", err);
+                    callback([]);
+                } else {
+                    const rows = res.data.values;
+                    const event = rows
+                        ? rows.map((row) => ({
+                              id: parseInt(row[0], 10),
+                              title: row[1],
+                              profession: row[2],
+                              about: row[3],
+                              date_duration: row[4],
+                              portfolio_id: row[5],
+                              status: parseInt(row[6]),
+                          }))
+                        : [];
+                    callback(event);
+                }
+            }
+        );
+    }
+
+    static experienceFindById(id, callback) {
+        ExperienceModel.getAllExperience((events) => {
+            const el = events.find((el) => el.id === id);
+            callback(el);
+        });
+    }
+};

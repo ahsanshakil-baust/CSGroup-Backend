@@ -24,6 +24,8 @@ const messageRouter = require("./routes/adminMessageRouter");
 const teamMemberRouter = require("./routes/adminTeamMemberRouter");
 const certificateRouter = require("./routes/adminCertificateRouter");
 const contactRouter = require("./routes/adminContactRouter");
+const portfolioRouter = require("./routes/adminPortfolioRouter");
+const experienceRouter = require("./routes/adminExperienceRouter");
 
 const app = express();
 
@@ -75,6 +77,8 @@ app.use("/admin/message", messageRouter);
 app.use("/admin/team", teamMemberRouter);
 app.use("/admin/certificate", certificateRouter);
 app.use("/admin/contact", contactRouter);
+app.use("/admin/portfolio", portfolioRouter);
+app.use("/admin/experience", experienceRouter);
 app.use("/", clientRouter);
 
 app.use((err, req, res, next) => {
