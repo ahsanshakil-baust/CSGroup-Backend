@@ -1,8 +1,8 @@
 const { google } = require("googleapis");
 
 const credentials = require("./credentials2.json");
-const sheetId = "1zpN0wzPiKEoRcw-UFg6oAqDfDxHfGPaG_IAtv6l02Fw";
-const range = "Sheet1!A:G";
+const sheetId = "14Stv0RVhbyDz3y71t-89_xPN7AW9R88dmzSatiFe6X8";
+const range = "Sheet1!A:H";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -11,10 +11,11 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 
-module.exports = class ExperienceModel {
+module.exports = class EducationModel {
     constructor(
         title,
         profession,
+        institution,
         about,
         date_duration,
         portfolio_id,
@@ -24,6 +25,7 @@ module.exports = class ExperienceModel {
         this.id = id;
         this.title = title;
         this.profession = profession;
+        this.institution = institution;
         this.about = about;
         this.date_duration = date_duration;
         this.portfolio_id = portfolio_id;
@@ -31,7 +33,7 @@ module.exports = class ExperienceModel {
     }
 
     save() {
-        ExperienceModel.getAllExperience((data) => {
+        EducationModel.getAllEducation((data) => {
             if (this.id > 0) {
                 data = data.map((el) => (el.id == this.id ? this : el));
             } else {
@@ -43,6 +45,7 @@ module.exports = class ExperienceModel {
                 el.id,
                 el.title,
                 el.profession,
+                el.institution,
                 el.about,
                 el.date_duration,
                 el.portfolio_id,
@@ -74,7 +77,7 @@ module.exports = class ExperienceModel {
         });
     }
 
-    static getAllExperience(callback) {
+    static getAllEducation(callback) {
         sheets.spreadsheets.values.get(
             {
                 spreadsheetId: sheetId,
@@ -91,10 +94,11 @@ module.exports = class ExperienceModel {
                               id: parseInt(row[0], 10),
                               title: row[1],
                               profession: row[2],
-                              about: row[3],
-                              date_duration: row[4],
-                              portfolio_id: row[5],
-                              status: parseInt(row[6]),
+                              institution: row[3],
+                              about: row[4],
+                              date_duration: row[5],
+                              portfolio_id: row[6],
+                              status: parseInt(row[7]),
                           }))
                         : [];
                     callback(event);
@@ -103,8 +107,8 @@ module.exports = class ExperienceModel {
         );
     }
 
-    static experienceFindById(id, callback) {
-        ExperienceModel.getAllExperience((events) => {
+    static educationFindById(id, callback) {
+        EducationModel.getAllEducation((events) => {
             const el = events.find((el) => el.id === id);
             callback(el);
         });
