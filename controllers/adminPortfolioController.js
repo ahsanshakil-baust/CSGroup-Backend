@@ -1,4 +1,6 @@
+const ExperienceModel = require("../models/experienceModel");
 const PortfolioModel = require("../models/portfolioModel");
+const EducationModel=require("../models/educationModel")
 
 const addPortfolio = (req, res, next) => {
     const { name, profession, url, email, phone, about } = req.body;
@@ -57,7 +59,7 @@ const getAllPortfolio = (req, res, next) => {
     });
 };
 
-const getPortfolio = (req, res, next) => {
+const getPortfolio = async(req, res, next) => {
     const { id } = req.params;
     const convertedId = Number(id);
 
@@ -66,9 +68,33 @@ const getPortfolio = (req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-        PortfolioModel.portfolioFindById(convertedId, (data) => {
-            res.status(200).json({ data });
-        });
+      const portfolio=await PortfolioModel.portfolioFindById(convertedId);
+      if (!portfolio) {
+        return res.status(404).json({ error: "Portfolio not found." });
+      }
+
+
+        // Fetch all dependent data in parallel with error handling
+        const [experience, education] = await Promise.all([
+            ExperienceModel.experienceFindById(id).catch((err) => {
+                console.error("Experience fetch error:", err);
+                return null;
+            }),
+            EducationModel.educationFindById(id).catch((err) => {
+                console.error("Land details fetch error:", err);
+                return null;
+            }),
+        ]);
+
+        // Construct response
+        const newData = {
+            ...portfolio,
+            experience_details: experience || {},
+            education_details: education || {},
+        };
+
+        return res.status(200).json({ data: newData });
+
     }
 };
 

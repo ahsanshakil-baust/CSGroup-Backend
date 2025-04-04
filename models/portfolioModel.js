@@ -108,9 +108,13 @@ module.exports = class PortfolioModel {
     }
 
     static portfolioFindById(id, callback) {
-        PortfolioModel.getAllPortfolio((events) => {
-            const el = events.find((el) => el.id === id);
-            callback(el);
-        });
+        return new Promise((resolve,reject)=>{
+
+            PortfolioModel.getAllPortfolio((portfolio) => {
+                if (!portfolio) return reject(new Error("No Portfolio found"));
+                const el = portfolio.find((el) => el.id === id) || null;
+                resolve(el);
+            });
+        })
     }
 };

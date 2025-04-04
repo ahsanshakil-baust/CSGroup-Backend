@@ -105,7 +105,7 @@ module.exports = class ExperienceModel {
 
     static experienceFindById(id, callback) {
         ExperienceModel.getAllExperience((events) => {
-            const el = events.find((el) => el.id === id);
+            const el = events.find((el) => el.portfolio_id == id);
             callback(el);
         });
     }

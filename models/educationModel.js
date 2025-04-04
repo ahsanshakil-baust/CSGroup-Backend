@@ -109,7 +109,7 @@ module.exports = class EducationModel {
 
     static educationFindById(id, callback) {
         EducationModel.getAllEducation((events) => {
-            const el = events.find((el) => el.id === id);
+            const el = events.find((el) => el.portfolio_id == id);
             callback(el);
         });
     }
