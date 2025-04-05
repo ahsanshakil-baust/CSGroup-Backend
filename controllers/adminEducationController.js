@@ -72,7 +72,7 @@ const getAllEducation = (req, res, next) => {
     });
 };
 
-const getEducation = (req, res, next) => {
+const getEducation = async (req, res, next) => {
     const { id } = req.params;
     const convertedId = Number(id);
 
@@ -81,9 +81,8 @@ const getEducation = (req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-        EducationModel.EducationFindById(convertedId, (data) => {
-            res.status(200).json({ data });
-        });
+        const data = await EducationModel.educationFindById(convertedId);
+        res.status(200).json({ data });
     }
 };
 

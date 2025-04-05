@@ -107,10 +107,21 @@ module.exports = class EducationModel {
         );
     }
 
+    // static educationFindById(id, callback) {
+    //     EducationModel.getAllEducation((events) => {
+    //         const el = events.find((el) => el.portfolio_id == id);
+    //         callback(el);
+    //     });
+    // }
+
     static educationFindById(id, callback) {
-        EducationModel.getAllEducation((events) => {
-            const el = events.find((el) => el.portfolio_id == id);
-            callback(el);
+        return new Promise((resolve, reject) => {
+            EducationModel.getAllEducation((education) => {
+                if (!education) return reject(new Error("No Education found"));
+                const el =
+                    education.find((el) => el.portfolio_id == id) || null;
+                resolve(el);
+            });
         });
     }
 };

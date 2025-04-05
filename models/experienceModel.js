@@ -103,10 +103,22 @@ module.exports = class ExperienceModel {
         );
     }
 
+    // static experienceFindById(id, callback) {
+    //     ExperienceModel.getAllExperience((events) => {
+    //         const el = events.find((el) => el.portfolio_id == id);
+    //         callback(el);
+    //     });
+    // }
+
     static experienceFindById(id, callback) {
-        ExperienceModel.getAllExperience((events) => {
-            const el = events.find((el) => el.portfolio_id == id);
-            callback(el);
+        return new Promise((resolve, reject) => {
+            ExperienceModel.getAllExperience((experience) => {
+                if (!experience)
+                    return reject(new Error("No Experience found"));
+                const el =
+                    experience.find((el) => el.portfolio_id == id) || null;
+                resolve(el);
+            });
         });
     }
 };

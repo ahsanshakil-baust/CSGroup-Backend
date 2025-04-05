@@ -32,7 +32,7 @@ module.exports = class PortfolioModel {
         this.status = status;
     }
 
-    save() {
+    save(callback) {
         PortfolioModel.getAllPortfolio((data) => {
             if (this.id > 0) {
                 data = data.map((el) => (el.id == this.id ? this : el));
@@ -40,6 +40,8 @@ module.exports = class PortfolioModel {
                 this.id = data.length + 1;
                 data.push(this);
             }
+
+            callback(this.id);
 
             const updatedData = data.map((el) => [
                 el.id,
@@ -108,13 +110,12 @@ module.exports = class PortfolioModel {
     }
 
     static portfolioFindById(id, callback) {
-        return new Promise((resolve,reject)=>{
-
+        return new Promise((resolve, reject) => {
             PortfolioModel.getAllPortfolio((portfolio) => {
                 if (!portfolio) return reject(new Error("No Portfolio found"));
-                const el = portfolio.find((el) => el.id === id) || null;
+                const el = portfolio.find((el) => el.id == id) || null;
                 resolve(el);
             });
-        })
+        });
     }
 };

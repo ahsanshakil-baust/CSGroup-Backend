@@ -56,7 +56,7 @@ const getAllExperience = (req, res, next) => {
     });
 };
 
-const getExperience = (req, res, next) => {
+const getExperience = async (req, res, next) => {
     const { id } = req.params;
     const convertedId = Number(id);
 
@@ -65,9 +65,8 @@ const getExperience = (req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-        ExperienceModel.experienceFindById(convertedId, (data) => {
-            res.status(200).json({ data });
-        });
+        const response = await ExperienceModel.experienceFindById(convertedId);
+        res.status(200).json({ data: response });
     }
 };
 

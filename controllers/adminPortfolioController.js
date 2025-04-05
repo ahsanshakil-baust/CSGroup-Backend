@@ -1,6 +1,6 @@
 const ExperienceModel = require("../models/experienceModel");
 const PortfolioModel = require("../models/portfolioModel");
-const EducationModel=require("../models/educationModel")
+const EducationModel = require("../models/educationModel");
 
 const addPortfolio = (req, res, next) => {
     const { name, profession, url, email, phone, about } = req.body;
@@ -17,10 +17,10 @@ const addPortfolio = (req, res, next) => {
             phone,
             about
         );
-        portfolio.save();
-
-        res.status(201).json({
-            msg: "Portfolio added successfully!",
+        portfolio.save((id) => {
+            res.status(201).json({
+                id,
+            });
         });
     }
 };
@@ -42,9 +42,10 @@ const updatePortfolio = (req, res, next) => {
             about
         );
         portfolio.id = id;
-        portfolio.save();
-        res.status(201).json({
-            msg: "Portfolio updated successfully!",
+        portfolio.save((id) => {
+            res.status(201).json({
+                id,
+            });
         });
     }
 };
@@ -59,7 +60,7 @@ const getAllPortfolio = (req, res, next) => {
     });
 };
 
-const getPortfolio = async(req, res, next) => {
+const getPortfolio = async (req, res, next) => {
     const { id } = req.params;
     const convertedId = Number(id);
 
@@ -68,11 +69,10 @@ const getPortfolio = async(req, res, next) => {
             error: "Need To Pass Id.",
         });
     } else {
-      const portfolio=await PortfolioModel.portfolioFindById(convertedId);
-      if (!portfolio) {
-        return res.status(404).json({ error: "Portfolio not found." });
-      }
-
+        const portfolio = await PortfolioModel.portfolioFindById(convertedId);
+        if (!portfolio) {
+            return res.status(404).json({ error: "Portfolio not found." });
+        }
 
         // Fetch all dependent data in parallel with error handling
         const [experience, education] = await Promise.all([
@@ -94,7 +94,6 @@ const getPortfolio = async(req, res, next) => {
         };
 
         return res.status(200).json({ data: newData });
-
     }
 };
 
