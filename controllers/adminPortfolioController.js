@@ -107,10 +107,11 @@ const deletePortfolio = (req, res, next) => {
         const portfolio = new PortfolioModel();
         portfolio.id = id;
         portfolio.status = 0;
-        portfolio.save();
-        res.status(201).json({
-            msg: "Portfolio deleted successfully!",
-        });
+        portfolio.save(() =>
+            res.status(201).json({
+                msg: "Portfolio deleted successfully!",
+            })
+        );
     }
 };
 

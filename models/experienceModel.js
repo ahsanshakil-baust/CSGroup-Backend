@@ -116,7 +116,18 @@ module.exports = class ExperienceModel {
                 if (!experience)
                     return reject(new Error("No Experience found"));
                 const el =
-                    experience.find((el) => el.portfolio_id == id) || null;
+                    experience.filter((el) => el.portfolio_id == id) || null;
+                resolve(el);
+            });
+        });
+    }
+
+    static experienceById(id, callback) {
+        return new Promise((resolve, reject) => {
+            ExperienceModel.getAllExperience((experience) => {
+                if (!experience)
+                    return reject(new Error("No Experience found"));
+                const el = experience.find((el) => el.id == id) || null;
                 resolve(el);
             });
         });

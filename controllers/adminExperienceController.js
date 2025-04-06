@@ -1,7 +1,7 @@
 const ExperienceModel = require("../models/experienceModel");
 
 const addExperience = (req, res, next) => {
-    const { title, profession, about, date_duration, Experience_id } = req.body;
+    const { title, profession, about, date_duration, portfolio_id } = req.body;
     if (title == "" || profession == "" || about == "") {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
@@ -12,7 +12,7 @@ const addExperience = (req, res, next) => {
             profession,
             about,
             date_duration,
-            Experience_id
+            portfolio_id
         );
         experience.save();
 
@@ -23,7 +23,7 @@ const addExperience = (req, res, next) => {
 };
 
 const updateExperience = (req, res, next) => {
-    const { id, title, profession, about, date_duration, Experience_id } =
+    const { id, title, profession, about, date_duration, portfolio_id } =
         req.body;
 
     if (!id) {
@@ -36,7 +36,7 @@ const updateExperience = (req, res, next) => {
             profession,
             about,
             date_duration,
-            Experience_id
+            portfolio_id
         );
         experience.id = id;
         experience.save();
@@ -66,6 +66,21 @@ const getExperience = async (req, res, next) => {
         });
     } else {
         const response = await ExperienceModel.experienceFindById(convertedId);
+        const newDate = response.filter((el) => el.status != 0);
+        res.status(200).json({ data: newDate });
+    }
+};
+
+const getExperienceById = async (req, res, next) => {
+    const { id } = req.params;
+    const convertedId = Number(id);
+
+    if (!id) {
+        res.status(500).json({
+            error: "Need To Pass Id.",
+        });
+    } else {
+        const response = await ExperienceModel.experienceById(convertedId);
         res.status(200).json({ data: response });
     }
 };
@@ -93,4 +108,5 @@ module.exports = {
     deleteExperience,
     getAllExperience,
     getExperience,
+    getExperienceById,
 };

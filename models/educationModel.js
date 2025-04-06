@@ -124,4 +124,14 @@ module.exports = class EducationModel {
             });
         });
     }
+
+    static educationById(id, callback) {
+        return new Promise((resolve, reject) => {
+            EducationModel.getAllEducation((education) => {
+                if (!education) return reject(new Error("No Education found"));
+                const el = education.find((el) => el.id == id) || null;
+                resolve(el);
+            });
+        });
+    }
 };

@@ -82,7 +82,22 @@ const getEducation = async (req, res, next) => {
         });
     } else {
         const data = await EducationModel.educationFindById(convertedId);
-        res.status(200).json({ data });
+        const newDate = data.filter((el) => el.status != 0);
+        res.status(200).json({ data: newDate });
+    }
+};
+
+const getEducationById = async (req, res, next) => {
+    const { id } = req.params;
+    const convertedId = Number(id);
+
+    if (!id) {
+        res.status(500).json({
+            error: "Need To Pass Id.",
+        });
+    } else {
+        const response = await EducationModel.educationById(convertedId);
+        res.status(200).json({ data: response });
     }
 };
 
@@ -109,4 +124,5 @@ module.exports = {
     deleteEducation,
     getAllEducation,
     getEducation,
+    getEducationById,
 };
