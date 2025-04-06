@@ -12,9 +12,9 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class MessageModel {
-    constructor(name, url, designation, message, status = 1, id = 0) {
+    constructor(member_id, url, designation, message, status = 1, id = 0) {
         this.id = id;
-        this.name = name;
+        this.member_id = member_id;
         this.url = url;
         this.designation = designation;
         this.message = message;
@@ -32,7 +32,7 @@ module.exports = class MessageModel {
 
             const updatedData = data.map((el) => [
                 el.id,
-                el.name,
+                el.member_id,
                 el.url,
                 el.designation,
                 el.message,
@@ -79,7 +79,7 @@ module.exports = class MessageModel {
                     const notice = rows
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
-                              name: row[1],
+                              member_id: row[1],
                               url: row[2],
                               designation: row[3],
                               message: row[4],

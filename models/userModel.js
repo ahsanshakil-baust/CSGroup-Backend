@@ -79,9 +79,9 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class User {
-    constructor(name, email, password, status = 0) {
+    constructor(member_id, email, password, status = 0) {
         this.id = 0;
-        this.name = name;
+        this.member_id = member_id;
         this.email = email;
         this.password = password;
         this.status = status;
@@ -100,7 +100,7 @@ module.exports = class User {
 
             const updatedData = users.map((u) => [
                 u.id,
-                u.name,
+                u.member_id,
                 u.email,
                 u.password,
                 u.status,
@@ -146,7 +146,7 @@ module.exports = class User {
                     if (rows && rows.length) {
                         const users = rows.map((row) => ({
                             id: parseInt(row[0]),
-                            name: row[1],
+                            member_id: row[1],
                             email: row[2],
                             password: row[3],
                             status: row[4],
@@ -168,7 +168,7 @@ module.exports = class User {
             if (userFound) {
                 callback({
                     id: userFound.id,
-                    name: userFound.name,
+                    member_id: userFound.member_id,
                     email: userFound.email,
                 });
             } else {

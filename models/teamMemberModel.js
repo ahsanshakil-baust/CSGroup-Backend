@@ -121,4 +121,19 @@ module.exports = class TeamMemberModel {
             callback(el);
         });
     }
+
+    static async teamMemberById(member_id) {
+        return new Promise((resolve, reject) => {
+            TeamMemberModel.getAllTeamMember((member) => {
+                if (!member) return reject(new Error("No team details found"));
+
+                const team =
+                    member.find(
+                        (el) => parseInt(el.id) == parseInt(member_id)
+                    ) || null;
+
+                resolve(team);
+            });
+        });
+    }
 };

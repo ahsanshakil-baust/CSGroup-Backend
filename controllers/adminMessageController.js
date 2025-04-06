@@ -1,13 +1,19 @@
 const MessageModel = require("../models/messageModel");
+const TeamMemberModel = require("../models/teamMemberModel");
 
 const addMessage = (req, res, next) => {
-    const { name, url, designation, message } = req.body;
-    if (name == "" || url == "" || message == "") {
+    const { member_id, url, designation, message } = req.body;
+    if (member_id == "" || url == "" || message == "") {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const messageObj = new MessageModel(name, url, designation, message);
+        const messageObj = new MessageModel(
+            member_id,
+            url,
+            designation,
+            message
+        );
         messageObj.save();
 
         res.status(201).json({
@@ -17,14 +23,19 @@ const addMessage = (req, res, next) => {
 };
 
 const updateMessage = (req, res, next) => {
-    const { id, name, url, designation, message } = req.body;
+    const { id, member_id, url, designation, message } = req.body;
 
     if (!id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const messageObj = new MessageModel(name, url, designation, message);
+        const messageObj = new MessageModel(
+            member_id,
+            url,
+            designation,
+            message
+        );
         messageObj.id = id;
         messageObj.save();
         res.status(201).json({
@@ -33,14 +44,37 @@ const updateMessage = (req, res, next) => {
     }
 };
 
-const getAllMessage = (req, res, next) => {
-    MessageModel.getAllMessage((data) => {
-        const newDate = data.filter((el) => el.status != 0);
+const getAllMessage = async (req, res, next) => {
+    // MessageModel.getAllMessage((data) => {
+    //     const newDate = data.filter((el) => el.status != 0);
 
-        res.status(200).json({
-            data: newDate,
+    //     res.status(200).json({
+    //         data: newDate,
+    //     });
+    // });
+
+    const message = await new Promise((resolve, reject) => {
+        MessageModel.getAllMessage((message) => {
+            if (!message) return reject(new Error("No message found"));
+            resolve(message);
         });
     });
+
+    const filteredMessage = message.filter((el) => el.status !== 0);
+
+    const memberDetailsPromises = filteredMessage.map(async (el) => {
+        const [member] = await Promise.all([
+            TeamMemberModel.teamMemberById(parseInt(el?.member_id)),
+        ]);
+
+        return {
+            ...el,
+            ...member,
+        };
+    });
+
+    const updateData = await Promise.all(memberDetailsPromises);
+    res.status(200).json({ data: updateData });
 };
 
 const getMessage = (req, res, next) => {

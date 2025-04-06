@@ -13,7 +13,7 @@ const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class PortfolioModel {
     constructor(
-        name,
+        member_id,
         profession,
         url,
         email,
@@ -23,7 +23,7 @@ module.exports = class PortfolioModel {
         id = 0
     ) {
         this.id = id;
-        this.name = name;
+        this.member_id = member_id;
         this.profession = profession;
         this.phone = phone;
         this.url = url;
@@ -45,7 +45,7 @@ module.exports = class PortfolioModel {
 
             const updatedData = data.map((el) => [
                 el.id,
-                el.name,
+                el.member_id,
                 el.profession,
                 el.phone,
                 el.url,
@@ -94,7 +94,7 @@ module.exports = class PortfolioModel {
                     const event = rows
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
-                              name: row[1],
+                              member_id: row[1],
                               profession: row[2],
                               phone: row[3],
                               url: row[4],

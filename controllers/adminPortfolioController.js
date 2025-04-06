@@ -1,16 +1,17 @@
 const ExperienceModel = require("../models/experienceModel");
 const PortfolioModel = require("../models/portfolioModel");
 const EducationModel = require("../models/educationModel");
+const TeamMemberModel = require("../models/teamMemberModel");
 
 const addPortfolio = (req, res, next) => {
-    const { name, profession, url, email, phone, about } = req.body;
-    if (name == "" || url == "" || about == "") {
+    const { member_id, profession, url, email, phone, about } = req.body;
+    if (member_id == "" || url == "" || about == "") {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
         const portfolio = new PortfolioModel(
-            name,
+            member_id,
             profession,
             url,
             email,
@@ -26,7 +27,7 @@ const addPortfolio = (req, res, next) => {
 };
 
 const updatePortfolio = (req, res, next) => {
-    const { id, name, profession, url, email, phone, about } = req.body;
+    const { id, member_id, profession, url, email, phone, about } = req.body;
 
     if (!id) {
         res.status(500).json({
@@ -34,7 +35,7 @@ const updatePortfolio = (req, res, next) => {
         });
     } else {
         const portfolio = new PortfolioModel(
-            name,
+            member_id,
             profession,
             url,
             email,
@@ -50,14 +51,37 @@ const updatePortfolio = (req, res, next) => {
     }
 };
 
-const getAllPortfolio = (req, res, next) => {
-    PortfolioModel.getAllPortfolio((data) => {
-        const newDate = data.filter((el) => el.status != 0);
+const getAllPortfolio = async (req, res, next) => {
+    // PortfolioModel.getAllPortfolio((data) => {
+    //     const newDate = data.filter((el) => el.status != 0);
 
-        res.status(200).json({
-            data: newDate,
+    //     res.status(200).json({
+    //         data: newDate,
+    //     });
+    // });
+
+    const portfolio = await new Promise((resolve, reject) => {
+        PortfolioModel.getAllPortfolio((portfolio) => {
+            if (!portfolio) return reject(new Error("No portfolio found"));
+            resolve(portfolio);
         });
     });
+
+    const filteredPortfolio = portfolio.filter((el) => el.status !== 0);
+
+    const memberDetailsPromises = filteredPortfolio.map(async (el) => {
+        const [member] = await Promise.all([
+            TeamMemberModel.teamMemberById(parseInt(el?.member_id)),
+        ]);
+
+        return {
+            ...el,
+            ...member,
+        };
+    });
+
+    const updateData = await Promise.all(memberDetailsPromises);
+    res.status(200).json({ data: updateData });
 };
 
 const getPortfolio = async (req, res, next) => {
@@ -75,7 +99,7 @@ const getPortfolio = async (req, res, next) => {
         }
 
         // Fetch all dependent data in parallel with error handling
-        const [experience, education] = await Promise.all([
+        const [experience, education, member] = await Promise.all([
             ExperienceModel.experienceFindById(id).catch((err) => {
                 console.error("Experience fetch error:", err);
                 return null;
@@ -84,6 +108,7 @@ const getPortfolio = async (req, res, next) => {
                 console.error("Land details fetch error:", err);
                 return null;
             }),
+            TeamMemberModel.teamMemberById(parseInt(portfolio?.member_id)),
         ]);
 
         const filterExperience = experience.filter((el) => el?.status != 0);
@@ -92,6 +117,7 @@ const getPortfolio = async (req, res, next) => {
         // Construct response
         const newData = {
             ...portfolio,
+            ...member,
             experience_details: filterExperience || {},
             education_details: filterEducation || {},
         };
