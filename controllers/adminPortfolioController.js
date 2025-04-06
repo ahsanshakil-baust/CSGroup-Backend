@@ -86,11 +86,14 @@ const getPortfolio = async (req, res, next) => {
             }),
         ]);
 
+        const filterExperience = experience.filter((el) => el?.status != 0);
+        const filterEducation = education.filter((el) => el?.status != 0);
+
         // Construct response
         const newData = {
             ...portfolio,
-            experience_details: experience || {},
-            education_details: education || {},
+            experience_details: filterExperience || {},
+            education_details: filterEducation || {},
         };
 
         return res.status(200).json({ data: newData });

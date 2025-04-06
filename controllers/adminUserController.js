@@ -53,7 +53,9 @@ const userLogin = async (req, res, next) => {
     const { email, password } = req.body;
 
     User.getAllUser(async (user) => {
-        const existingUser = user.find((el) => el.email === email);
+        const existingUser = user.find(
+            (el) => el.email === email && el.status == 1
+        );
 
         if (!existingUser) {
             return res.status(400).send("User not exists");

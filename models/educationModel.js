@@ -119,7 +119,7 @@ module.exports = class EducationModel {
             EducationModel.getAllEducation((education) => {
                 if (!education) return reject(new Error("No Education found"));
                 const el =
-                    education.find((el) => el.portfolio_id == id) || null;
+                    education.filter((el) => el.portfolio_id == id) || null;
                 resolve(el);
             });
         });
