@@ -96,10 +96,52 @@ const checkLogin = (req, res, next) => {
     else res.send("0");
 };
 
+const changePassword = async (req, res, next) => {
+    const { email } = req.user;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (newPassword == confirmPassword) {
+        User.getAllUser(async (user) => {
+            const existingUser = user.find(
+                (el) => el.email === email && el.status == 1
+            );
+
+            if (!existingUser) {
+                return res.status(400).send("User not exists");
+            }
+
+            const isPasswordValid = await comparePassword(
+                currentPassword,
+                existingUser.password
+            );
+
+            if (isPasswordValid) {
+                const hashedPassword = await hashPassword(confirmPassword);
+                const user = new User(existingUser.name, email, hashedPassword);
+                user.id = existingUser.id;
+                user.save();
+
+                res.status(201).json({
+                    msg: "User Password Updated successfully!",
+                });
+            } else {
+                res.status(500).json({
+                    msg: "Password does not match",
+                });
+            }
+        });
+    } else {
+        res.status(500).json({
+            msg: "Password does not match",
+        });
+    }
+};
+
 module.exports = {
     getAllUser,
     getUserByEmail,
     addUser,
     userLogin,
     checkLogin,
+    changePassword,
 };
