@@ -2,18 +2,13 @@ const MessageModel = require("../models/messageModel");
 const TeamMemberModel = require("../models/teamMemberModel");
 
 const addMessage = (req, res, next) => {
-    const { member_id, url, designation, message } = req.body;
-    if (member_id == "" || url == "" || message == "") {
+    const { member_id, message } = req.body;
+    if (member_id == "" || message == "") {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const messageObj = new MessageModel(
-            member_id,
-            url,
-            designation,
-            message
-        );
+        const messageObj = new MessageModel(member_id, message);
         messageObj.save();
 
         res.status(201).json({
@@ -23,19 +18,14 @@ const addMessage = (req, res, next) => {
 };
 
 const updateMessage = (req, res, next) => {
-    const { id, member_id, url, designation, message } = req.body;
+    const { id, member_id, message } = req.body;
 
     if (!id) {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
         });
     } else {
-        const messageObj = new MessageModel(
-            member_id,
-            url,
-            designation,
-            message
-        );
+        const messageObj = new MessageModel(member_id, message);
         messageObj.id = id;
         messageObj.save();
         res.status(201).json({

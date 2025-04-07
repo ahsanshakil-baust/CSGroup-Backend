@@ -64,8 +64,8 @@
 
 const { google } = require("googleapis");
 
-const credentials = require("./credentials2.json");
-const sheetId = "1zxJbE8Q4ek9n5RKQ82heo-fGPN4GSULtjbnTSWEUPm0";
+const credentials = require("./credentials.json");
+const sheetId = "1yEWz8zgGLy7VpfvvJAGkdDCzxsKcpNii0t_wkcFnAQU";
 const range = "Sheet1!A:G"; // Adjust sheet name if needed
 
 const auth = new google.auth.GoogleAuth({

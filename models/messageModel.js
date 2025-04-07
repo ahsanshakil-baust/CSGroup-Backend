@@ -1,8 +1,8 @@
 const { google } = require("googleapis");
 
-const credentials = require("./credentials2.json");
-const sheetId = "1S45i6fRkh_amvzlRdKBLx44bfrcmo5pgsvVXOEsuFWI";
-const range = "Sheet1!A:F";
+const credentials = require("./credentials.json");
+const sheetId = "1Dgu_qjpAIHTDLC8SdpZWu5cCbD60HjTLyUmBg9RAbmg";
+const range = "Sheet1!A:D";
 
 const auth = new google.auth.GoogleAuth({
     credentials,
@@ -12,11 +12,11 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class MessageModel {
-    constructor(member_id, url, designation, message, status = 1, id = 0) {
+    constructor(member_id, message, status = 1, id = 0) {
         this.id = id;
         this.member_id = member_id;
-        this.url = url;
-        this.designation = designation;
+        // this.url = url;
+        // this.designation = designation;
         this.message = message;
         this.status = status;
     }
@@ -33,8 +33,8 @@ module.exports = class MessageModel {
             const updatedData = data.map((el) => [
                 el.id,
                 el.member_id,
-                el.url,
-                el.designation,
+                // el.url,
+                // el.designation,
                 el.message,
                 el.status,
             ]);
@@ -80,10 +80,10 @@ module.exports = class MessageModel {
                         ? rows.map((row) => ({
                               id: parseInt(row[0], 10),
                               member_id: row[1],
-                              url: row[2],
-                              designation: row[3],
-                              message: row[4],
-                              status: parseInt(row[5]),
+                              //   url: row[2],
+                              //   designation: row[3],
+                              message: row[2],
+                              status: parseInt(row[3]),
                           }))
                         : [];
                     callback(notice);
