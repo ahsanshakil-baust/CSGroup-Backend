@@ -2,43 +2,45 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    getSliderText,
-    getAllSliderDetails,
-    getSliderTextBn,
+  getSliderText,
+  getAllSliderDetails,
+  getSliderTextBn,
 } = require("../controllers/adminHomeSliderController");
 const {
-    getFlatDetails,
-    getAllFlats,
+  getFlatDetails,
+  getAllFlats,
 } = require("../controllers/adminFlatController");
 const {
-    getAllProject,
-    getProject,
+  getAllProject,
+  getProject,
 } = require("../controllers/adminProjectController");
 const {
-    getAllShares,
-    getShare,
+  getAllShares,
+  getShare,
 } = require("../controllers/adminShareController");
 const { getAllNotice } = require("../controllers/adminNoticeController");
 const {
-    getAllEvent,
-    getEventReels,
+  getAllEvent,
+  getEventReels,
 } = require("../controllers/adminEventController");
 const { getAllMessage } = require("../controllers/adminMessageController");
 const {
-    getAllTeamMember,
+  getAllTeamMember,
 } = require("../controllers/adminTeamMemberController");
 const {
-    getAllCertificate,
+  getAllCertificate,
 } = require("../controllers/adminCertificateController");
 const { getContact } = require("../controllers/adminContactController");
 const {
-    getAllPortfolio,
-    getPortfolio,
+  getAllPortfolio,
+  getPortfolio,
 } = require("../controllers/adminPortfolioController");
+const { getAllReel } = require("../controllers/adminSliderReelsCOntroller");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
 router.get("/sliders", getAllSliderDetails);
+router.get("/reel/all", getAllReel);
 router.get("/flat/all", getAllFlats);
 router.get("/flat/:id", getFlatDetails);
 router.get("/project/all", getAllProject);

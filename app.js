@@ -27,6 +27,8 @@ const contactRouter = require("./routes/adminContactRouter");
 const portfolioRouter = require("./routes/adminPortfolioRouter");
 const experienceRouter = require("./routes/adminExperienceRouter");
 const educationRouter = require("./routes/adminEducationRouter");
+const skillRouter = require("./routes/adminSkillRouter");
+const reelRouter = require("./routes/adminReelRouter");
 
 const app = express();
 
@@ -81,6 +83,8 @@ app.use("/admin/contact", contactRouter);
 app.use("/admin/portfolio", portfolioRouter);
 app.use("/admin/experience", experienceRouter);
 app.use("/admin/education", educationRouter);
+app.use("/admin/skill", skillRouter);
+app.use("/admin/reel", reelRouter);
 app.use("/", clientRouter);
 
 app.use((err, req, res, next) => {
