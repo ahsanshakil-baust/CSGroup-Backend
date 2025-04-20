@@ -36,6 +36,7 @@ const {
   getPortfolio,
 } = require("../controllers/adminPortfolioController");
 const { getAllReel } = require("../controllers/adminSliderReelsCOntroller");
+const { getAllSkill } = require("../controllers/adminSkillsController");
 
 router.get("/slider-text", getSliderText);
 router.get("/slider-text-bn", getSliderTextBn);
@@ -56,5 +57,6 @@ router.get("/certificate/all", getAllCertificate);
 router.get("/contact", getContact);
 router.get("/portfolio/all", getAllPortfolio);
 router.get("/portfolio/:id", getPortfolio);
+// router.post("/skill/all", getAllSkill);
 
 module.exports = router;

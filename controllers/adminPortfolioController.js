@@ -100,7 +100,7 @@ const getPortfolio = async (req, res, next) => {
     }
 
     // Fetch all dependent data in parallel with error handling
-    const [experience, education, , skills] = await Promise.all([
+    const [experience, education, member, skills] = await Promise.all([
       ExperienceModel.experienceFindById(id).catch((err) => {
         console.error("Experience fetch error:", err);
         return null;

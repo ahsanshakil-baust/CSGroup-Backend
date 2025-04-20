@@ -83,7 +83,7 @@ module.exports = class HomeSliderReelsModel {
 
   static reelsFindById(id, callback) {
     HomeSliderReelsModel.getAllReels((reels) => {
-      const el = reels.filter((el) => el.id == id);
+      const el = reels.find((el) => el.id == id);
       callback(el);
     });
   }

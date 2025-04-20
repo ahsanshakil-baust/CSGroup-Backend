@@ -2,7 +2,7 @@ const { google } = require("googleapis");
 
 const credentials = require("./credentials.json");
 const sheetId = "1QyOOkgcEJQWwQHdV4gR8SCPizUZ4fN9OCTqot7csL2Q";
-const range = "Sheet1!A:C";
+const range = "Sheet1!A:D";
 
 const auth = new google.auth.GoogleAuth({
   credentials,
@@ -12,9 +12,10 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 
 module.exports = class SkillModel {
-  constructor(title, status = 1, id = 0) {
+  constructor(title, portfolio_id, status = 1, id = 0) {
     this.id = id;
     this.title = title;
+    this.portfolio_id = portfolio_id;
     this.status = status;
   }
 
@@ -27,7 +28,12 @@ module.exports = class SkillModel {
         data.push(this);
       }
 
-      const updatedData = data.map((el) => [el.id, el.title, el.status]);
+      const updatedData = data.map((el) => [
+        el.id,
+        el.title,
+        el.portfolio_id,
+        el.status,
+      ]);
 
       sheets.spreadsheets.values.update(
         {
@@ -42,7 +48,7 @@ module.exports = class SkillModel {
           if (err) {
             console.error("Error saving data to Google Sheets:", err);
           } else {
-            console.log("Certificate saved successfully to Google Sheets!");
+            console.log("Skill saved successfully to Google Sheets!");
           }
         }
       );
@@ -61,11 +67,13 @@ module.exports = class SkillModel {
           callback([]);
         } else {
           const rows = res.data.values;
+
           const event = rows
             ? rows.map((row) => ({
                 id: parseInt(row[0], 10),
                 title: row[1],
-                status: parseInt(row[2]),
+                portfolio_id: row[2],
+                status: parseInt(row[3]),
               }))
             : [];
           callback(event);
@@ -77,7 +85,7 @@ module.exports = class SkillModel {
   static skillFindById(id, callback) {
     return new Promise((resolve, reject) => {
       SkillModel.getAllSkills((skills) => {
-        if (!skills) return reject(new Error("No Experience found"));
+        if (!skills) return reject(new Error("No Skills found"));
         const el = skills.filter((el) => el.portfolio_id == id) || null;
         resolve(el);
       });
@@ -87,7 +95,7 @@ module.exports = class SkillModel {
   static skillById(id, callback) {
     return new Promise((resolve, reject) => {
       SkillModel.getAllSkills((skills) => {
-        if (!skills) return reject(new Error("No Experience found"));
+        if (!skills) return reject(new Error("No Skills found"));
         const el = skills.find((el) => el.id == id) || null;
         resolve(el);
       });

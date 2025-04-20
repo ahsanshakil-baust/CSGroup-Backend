@@ -1,13 +1,13 @@
 const SkillModel = require("../models/skillModel");
 
 const addSkill = (req, res, next) => {
-  const { title } = req.body;
-  if (title == "") {
+  const { title, portfolio_id } = req.body;
+  if (title == "" || !portfolio_id) {
     res.status(500).json({
       error: "Need to fill all necessary fields.",
     });
   } else {
-    const skill = new SkillModel(title);
+    const skill = new SkillModel(title, portfolio_id);
     skill.save();
 
     res.status(201).json({
@@ -17,14 +17,14 @@ const addSkill = (req, res, next) => {
 };
 
 const updateSkill = (req, res, next) => {
-  const { id, title } = req.body;
+  const { id, title, portfolio_id } = req.body;
 
-  if (!id || !title) {
+  if (!id || !title || !portfolio_id) {
     res.status(500).json({
       error: "Need to fill all necessary fields.",
     });
   } else {
-    const skill = new SkillModel(title);
+    const skill = new SkillModel(title, portfolio_id);
     skill.id = id;
     skill.save();
     res.status(201).json({
@@ -35,26 +35,33 @@ const updateSkill = (req, res, next) => {
 
 const getAllSkill = (req, res, next) => {
   SkillModel.getAllSkills((data) => {
-    const newDate = data.filter((el) => el.status != 0);
+    const newData = data.filter((el) => el.status != 0);
+
+    console.log(newData);
 
     res.status(200).json({
-      data: newDate,
+      data: newData,
     });
   });
 };
 
-const getSkill = (req, res, next) => {
+const getSkill = async (req, res, next) => {
   const { id } = req.params;
   const convertedId = Number(id);
+
+  console.log(convertedId);
 
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    SkillModel.skillFindById(convertedId, (data) => {
-      res.status(200).json({ data });
-    });
+    const data = await SkillModel.skillFindById(convertedId);
+    console.log(data);
+
+    const filterData = data.filter((el) => el.status != 0);
+
+    res.status(200).json({ data: filterData });
   }
 };
 
