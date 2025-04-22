@@ -42,7 +42,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://test.chirosobujgroup.com",
-  "https://chirosobujgroup.com/",
+  "https://chirosobujgroup.com",
+  "http://chirosobujgroup.com",
 ];
 
 const corsOptions = {
