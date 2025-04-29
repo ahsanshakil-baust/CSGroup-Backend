@@ -15,9 +15,47 @@ const getAllFlats = async (req, res, next) => {
         });
 
         // Filter flats where status !== 0
-        const filteredFlats = flats.filter((el) => el.status !== 0);
+        const filteredFlats = flats.filter((el) => el.status != 0);
 
-        if (filteredFlats.length === 0) {
+        if (filteredFlats.length == 0) {
+            return res.status(200).json({ data: [] });
+        }
+
+        // Fetch land details and project details in parallel
+        const flatDetailsPromises = filteredFlats.map(async (el) => {
+            const [landDetails, project] = await Promise.all([
+                FlatLandDetailsModel.landFindById(el.id),
+                ProjectModel.projectFindById(el.project_id),
+            ]);
+
+            return {
+                ...el,
+                land_details: landDetails || {},
+                project_details: project || {},
+            };
+        });
+
+        // Wait for all promises to resolve
+        const updatedFlats = await Promise.all(flatDetailsPromises);
+
+        res.status(200).json({ data: updatedFlats });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getAllFlatsByProject = async (req, res, next) => {
+    const { id, floor } = req.body;
+    try {
+        // Convert getAllFlat to return a Promise
+        const flats = await new Promise((resolve, reject) => {
+            FlatModel.flatIdByProjectFloor(id, floor);
+        });
+
+        // Filter flats where status !== 0
+        const filteredFlats = flats.filter((el) => el.status != 0);
+
+        if (filteredFlats.length == 0) {
             return res.status(200).json({ data: [] });
         }
 
@@ -243,4 +281,5 @@ module.exports = {
     addFlat,
     updateFlat,
     deleteFlat,
+    getAllFlatsByProject,
 };
