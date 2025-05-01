@@ -1,147 +1,238 @@
-const { google } = require("googleapis");
+// const { google } = require("googleapis");
 
-const credentials = require("./credentials.json");
-const sheetId = "1T8GJoUcX0Mf3jRn3qeJ2qYzUz-Hi2p2lPPpyNksiBeY";
-const range = "Sheet1!A:N";
+// const credentials = require("./credentials.json");
+// const sheetId = "1T8GJoUcX0Mf3jRn3qeJ2qYzUz-Hi2p2lPPpyNksiBeY";
+// const range = "Sheet1!A:N";
 
-const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
+// const auth = new google.auth.GoogleAuth({
+//     credentials,
+//     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+// });
 
-const sheets = google.sheets({ version: "v4", auth });
+// const sheets = google.sheets({ version: "v4", auth });
+
+// module.exports = class FlatLandDetailsModel {
+//     constructor(
+//         area,
+//         building_height,
+//         total_share,
+//         total_sqf,
+//         net_sqf,
+//         price,
+//         reg_cost,
+//         khariz_cost,
+//         other_cost,
+//         total_price,
+//         flat_id,
+//         id = 0,
+//         status = 1
+//     ) {
+//         this.id = id;
+//         this.area = area;
+//         this.building_height = building_height;
+//         this.total_share = total_share;
+//         this.total_sqf = total_sqf;
+//         this.net_sqf = net_sqf;
+//         this.price = price;
+//         this.reg_cost = reg_cost;
+//         this.khariz_cost = khariz_cost;
+//         this.other_cost = other_cost;
+//         this.total_price = total_price;
+//         this.flat_id = flat_id;
+//         this.status = status;
+//     }
+
+//     save(callback) {
+//         FlatLandDetailsModel.getAllLandDetails((lands) => {
+//             if (this.id > 0) {
+//                 lands = lands.map((land) => (land.id == this.id ? this : land));
+//             } else {
+//                 this.id = lands.length + 1;
+//                 lands.push(this);
+//             }
+//             callback({
+//                 id: this.id,
+//                 flat_id: parseInt(this.flat_id),
+//             });
+
+//             const updatedData = lands.map((land) => [
+//                 land.id,
+//                 land.area,
+//                 land.building_height,
+//                 land.total_share,
+//                 land.total_sqf,
+//                 land.net_sqf,
+//                 land.price,
+//                 land.reg_cost,
+//                 land.khariz_cost,
+//                 land.other_cost,
+//                 land.total_price,
+//                 land.flat_id,
+//                 land.status,
+//             ]);
+
+//             sheets.spreadsheets.values.update(
+//                 {
+//                     spreadsheetId: sheetId,
+//                     range: range,
+//                     valueInputOption: "RAW",
+//                     requestBody: { values: updatedData },
+//                 },
+//                 (err, res) => {
+//                     if (err) {
+//                         console.error(
+//                             "Error saving data to Google Sheets:",
+//                             err
+//                         );
+//                     } else {
+//                         console.log(
+//                             "Data saved successfully to Google Sheets!"
+//                         );
+//                     }
+//                 }
+//             );
+//         });
+//     }
+
+//     static getAllLandDetails(callback) {
+//         sheets.spreadsheets.values.get(
+//             {
+//                 spreadsheetId: sheetId,
+//                 range: range,
+//             },
+//             (err, res) => {
+//                 if (err) {
+//                     console.error("Error reading from Google Sheets:", err);
+//                     callback([]);
+//                 } else {
+//                     const rows = res.data.values;
+//                     const land = rows
+//                         ? rows.map((row) => ({
+//                               id: parseInt(row[0], 10),
+//                               area: row[1],
+//                               building_height: row[2],
+//                               total_share: row[3],
+//                               total_sqf: row[4],
+//                               net_sqf: row[5],
+//                               price: row[6],
+//                               reg_cost: row[7],
+//                               khariz_cost: row[8],
+//                               other_cost: row[9],
+//                               total_price: row[10],
+//                               flat_id: row[11],
+//                               status: parseInt(row[12], 10),
+//                           }))
+//                         : [];
+
+//                     callback(land);
+//                 }
+//             }
+//         );
+//     }
+
+//     static async landFindById(flat_id) {
+//         return new Promise((resolve, reject) => {
+//             FlatLandDetailsModel.getAllLandDetails((lands) => {
+//                 if (!lands) return reject(new Error("No land details found"));
+
+//                 const land =
+//                     lands.find(
+//                         (land) => parseInt(land.flat_id) === parseInt(flat_id)
+//                     ) || null;
+
+//                 resolve(land);
+//             });
+//         });
+//     }
+// };
+
+// FlatLandDetailsModel.js
+const db = require("./firebase");
 
 module.exports = class FlatLandDetailsModel {
-    constructor(
-        area,
-        building_height,
-        total_share,
-        total_sqf,
-        net_sqf,
-        price,
-        reg_cost,
-        khariz_cost,
-        other_cost,
-        total_price,
-        flat_id,
-        id = 0,
-        status = 1
-    ) {
-        this.id = id;
-        this.area = area;
-        this.building_height = building_height;
-        this.total_share = total_share;
-        this.total_sqf = total_sqf;
-        this.net_sqf = net_sqf;
-        this.price = price;
-        this.reg_cost = reg_cost;
-        this.khariz_cost = khariz_cost;
-        this.other_cost = other_cost;
-        this.total_price = total_price;
-        this.flat_id = flat_id;
-        this.status = status;
+  constructor(
+    area,
+    building_height,
+    total_share,
+    total_sqf,
+    net_sqf,
+    price,
+    reg_cost,
+    khariz_cost,
+    other_cost,
+    total_price,
+    flat_id,
+    id = 0,
+    status = 1
+  ) {
+    this.id = id;
+    this.area = area;
+    this.building_height = building_height;
+    this.total_share = total_share;
+    this.total_sqf = total_sqf;
+    this.net_sqf = net_sqf;
+    this.price = price;
+    this.reg_cost = reg_cost;
+    this.khariz_cost = khariz_cost;
+    this.other_cost = other_cost;
+    this.total_price = total_price;
+    this.flat_id = flat_id;
+    this.status = status;
+  }
+
+  async save(callback) {
+    const flatRef = db.collection("flat_land_details").doc(String(this.id));
+
+    try {
+      await flatRef.set({
+        area: this.area,
+        building_height: this.building_height,
+        total_share: this.total_share,
+        total_sqf: this.total_sqf,
+        net_sqf: this.net_sqf,
+        price: this.price,
+        reg_cost: this.reg_cost,
+        khariz_cost: this.khariz_cost,
+        other_cost: this.other_cost,
+        total_price: this.total_price,
+        flat_id: this.flat_id,
+        status: this.status,
+      });
+      console.log("Flat land details saved successfully to Firestore!");
+      callback({
+        id: this.id,
+        flat_id: parseInt(this.flat_id),
+      });
+    } catch (err) {
+      console.error("Error saving flat land details to Firestore:", err);
     }
+  }
 
-    save(callback) {
-        FlatLandDetailsModel.getAllLandDetails((lands) => {
-            if (this.id > 0) {
-                lands = lands.map((land) => (land.id == this.id ? this : land));
-            } else {
-                this.id = lands.length + 1;
-                lands.push(this);
-            }
-            callback({
-                id: this.id,
-                flat_id: parseInt(this.flat_id),
-            });
+  static async getAllLandDetails(callback) {
+    const flatRef = db.collection("flat_land_details");
 
-            const updatedData = lands.map((land) => [
-                land.id,
-                land.area,
-                land.building_height,
-                land.total_share,
-                land.total_sqf,
-                land.net_sqf,
-                land.price,
-                land.reg_cost,
-                land.khariz_cost,
-                land.other_cost,
-                land.total_price,
-                land.flat_id,
-                land.status,
-            ]);
-
-            sheets.spreadsheets.values.update(
-                {
-                    spreadsheetId: sheetId,
-                    range: range,
-                    valueInputOption: "RAW",
-                    requestBody: { values: updatedData },
-                },
-                (err, res) => {
-                    if (err) {
-                        console.error(
-                            "Error saving data to Google Sheets:",
-                            err
-                        );
-                    } else {
-                        console.log(
-                            "Data saved successfully to Google Sheets!"
-                        );
-                    }
-                }
-            );
-        });
+    try {
+      const snapshot = await flatRef.get();
+      const lands = snapshot.docs.map((doc) => doc.data());
+      callback(lands);
+    } catch (err) {
+      console.error("Error reading flat land details from Firestore:", err);
+      callback([]);
     }
+  }
 
-    static getAllLandDetails(callback) {
-        sheets.spreadsheets.values.get(
-            {
-                spreadsheetId: sheetId,
-                range: range,
-            },
-            (err, res) => {
-                if (err) {
-                    console.error("Error reading from Google Sheets:", err);
-                    callback([]);
-                } else {
-                    const rows = res.data.values;
-                    const land = rows
-                        ? rows.map((row) => ({
-                              id: parseInt(row[0], 10),
-                              area: row[1],
-                              building_height: row[2],
-                              total_share: row[3],
-                              total_sqf: row[4],
-                              net_sqf: row[5],
-                              price: row[6],
-                              reg_cost: row[7],
-                              khariz_cost: row[8],
-                              other_cost: row[9],
-                              total_price: row[10],
-                              flat_id: row[11],
-                              status: parseInt(row[12], 10),
-                          }))
-                        : [];
-
-                    callback(land);
-                }
-            }
-        );
+  static async landFindById(flat_id) {
+    try {
+      const landData = await FlatLandDetailsModel.getAllLandDetails(
+        (data) => data
+      );
+      const land = landData.find(
+        (land) => parseInt(land.flat_id) === parseInt(flat_id)
+      );
+      return land || null;
+    } catch (err) {
+      console.error("Error finding land by flat_id:", err);
+      return null;
     }
-
-    static async landFindById(flat_id) {
-        return new Promise((resolve, reject) => {
-            FlatLandDetailsModel.getAllLandDetails((lands) => {
-                if (!lands) return reject(new Error("No land details found"));
-
-                const land =
-                    lands.find(
-                        (land) => parseInt(land.flat_id) === parseInt(flat_id)
-                    ) || null;
-
-                resolve(land);
-            });
-        });
-    }
+  }
 };
