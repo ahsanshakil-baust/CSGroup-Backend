@@ -153,8 +153,6 @@ module.exports = class User {
         users.push(doc.data());
       });
       callback(users);
-
-      console.log(users);
     } catch (err) {
       console.error("Error fetching users from Firestore:", err);
       callback([]);
