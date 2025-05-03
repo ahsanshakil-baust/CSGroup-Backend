@@ -154,9 +154,10 @@
 // };
 
 const db = require("./firebase");
+const collectionName = "home_client_reviews";
 
 module.exports = class HomeClientReview {
-  constructor(name, url, comment, star, video, status = 1, id = 0) {
+  constructor(name, url, comment, star, video, status = 1, id = null) {
     this.id = id;
     this.name = name;
     this.url = url;
@@ -166,64 +167,58 @@ module.exports = class HomeClientReview {
     this.status = status;
   }
 
-  async save(callback) {
-    const reviewRef = db.collection("client_reviews").doc(String(this.id));
-
+  async save() {
     try {
-      await reviewRef.set({
-        name: this.name,
-        url: this.url,
-        comment: this.comment,
-        star: this.star,
-        video: this.video,
-        status: this.status,
-      });
-      console.log("Client review saved successfully to Firestore!");
-      callback({ id: this.id });
-    } catch (err) {
-      console.error("Error saving review to Firestore:", err);
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      console.log("Client review saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving client review to Firebase:", error);
     }
   }
 
   static async getAllReview(callback) {
-    const reviewRef = db.collection("client_reviews");
-
     try {
-      const snapshot = await reviewRef.get();
+      const snapshot = await db.collection(collectionName).get();
       const reviews = snapshot.docs.map((doc) => doc.data());
       callback(reviews);
-    } catch (err) {
-      console.error("Error reading reviews from Firestore:", err);
+    } catch (error) {
+      console.error("Error retrieving reviews from Firebase:", error);
       callback([]);
     }
   }
 
   static async reviewFindById(id, callback) {
-    const reviewRef = db.collection("client_reviews").doc(String(id));
-
     try {
-      const doc = await reviewRef.get();
-      if (doc.exists) {
-        callback(doc.data());
-      } else {
+      const doc = await db.collection(collectionName).doc(id.toString()).get();
+      console.log(doc);
+
+      if (!doc.exists) {
         callback(null);
+      } else {
+        callback(doc.data());
       }
-    } catch (err) {
-      console.error("Error finding review by ID:", err);
+    } catch (error) {
+      console.error("Error finding review by ID:", error);
       callback(null);
     }
   }
 
-  static async deleteById(id, callback) {
-    const reviewRef = db.collection("client_reviews").doc(String(id));
-
+  static async deleteById(id) {
     try {
-      await reviewRef.delete();
-      console.log("Client review deleted successfully from Firestore!");
-      callback(null);
-    } catch (err) {
-      console.error("Error deleting review from Firestore:", err);
-      callback(err);
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Review with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting review with ID ${id}:`, error);
     }
   }
 };

@@ -58,17 +58,20 @@ const getReel = (req, res, next) => {
   }
 };
 
-const deleteReel = (req, res, next) => {
+const deleteReel = async (req, res, next) => {
   const { id } = req.body;
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    const reel = new HomeSliderReelsModel();
-    reel.id = id;
-    reel.status = 0;
-    reel.save();
+    // const reel = new HomeSliderReelsModel();
+    // reel.id = id;
+    // reel.status = 0;
+    // reel.save();
+
+    await HomeSliderReelsModel.deleteById(id);
+
     res.status(201).json({
       msg: "Reel deleted successfully!",
     });

@@ -1,10 +1,10 @@
 const express = require("express");
 const authurization = require("../middlewares/authorization");
 const {
-    addMessage,
-    updateMessage,
-    getMessage,
-    deleteMessage,
+  addMessage,
+  updateMessage,
+  getMessage,
+  deleteMessage,
 } = require("../controllers/adminMessageController");
 
 const router = express.Router();

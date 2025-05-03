@@ -111,6 +111,7 @@
 // };
 
 const db = require("./firebase");
+const collectionName = "notices";
 
 module.exports = class NoticeModel {
   constructor(
@@ -121,7 +122,7 @@ module.exports = class NoticeModel {
     text = "",
     signatory,
     status = 1,
-    id = 0
+    id = null
   ) {
     this.id = id;
     this.title = title;
@@ -133,62 +134,56 @@ module.exports = class NoticeModel {
     this.status = status;
   }
 
-  async save(callback) {
+  async save() {
     try {
-      const noticesRef = db.collection("notices").doc(String(this.id));
+      let docRef;
 
-      if (this.id === 0) {
-        this.id = Date.now(); // Create a unique ID using timestamp
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
       }
 
-      await noticesRef.set({
-        title: this.title,
-        url: this.url,
-        date: this.date,
-        type: this.type,
-        text: this.text,
-        signatory: this.signatory,
-        status: this.status,
-      });
-
-      console.log("Notice saved successfully to Firestore!");
-      callback(this);
-    } catch (err) {
-      console.error("Error saving data to Firestore:", err);
+      console.log("Notice saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving notice to Firebase:", error);
     }
   }
 
-  static async getAllNotices(callback) {
+  static async getAllNotice(callback) {
     try {
-      const snapshot = await db.collection("notices").get();
-      const notices = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        title: doc.data().title,
-        url: doc.data().url,
-        date: doc.data().date,
-        type: doc.data().type,
-        text: doc.data().text,
-        signatory: doc.data().signatory,
-        status: doc.data().status,
-      }));
+      const snapshot = await db.collection(collectionName).get();
+      const notices = snapshot.docs.map((doc) => doc.data());
       callback(notices);
-    } catch (err) {
-      console.error("Error reading from Firestore:", err);
+    } catch (error) {
+      console.error("Error retrieving notices from Firebase:", error);
       callback([]);
     }
   }
 
   static async noticeFindById(id, callback) {
     try {
-      const doc = await db.collection("notices").doc(id).get();
-      if (doc.exists) {
-        callback(doc.data());
-      } else {
+      const doc = await db.collection(collectionName).doc(id.toString()).get();
+      if (!doc.exists) {
         callback(null);
+      } else {
+        callback(doc.data());
       }
-    } catch (err) {
-      console.error("Error fetching data from Firestore:", err);
+    } catch (error) {
+      console.error("Error finding notice by ID:", error);
       callback(null);
+    }
+  }
+
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Notice with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting notice with ID ${id}:`, error);
     }
   }
 };

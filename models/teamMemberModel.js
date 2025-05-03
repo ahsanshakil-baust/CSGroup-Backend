@@ -215,8 +215,11 @@ module.exports = class TeamMemberModel {
   static async teamMemberFindById(id, callback) {
     try {
       const doc = await db.collection("teamMembers").doc(id.toString()).get();
+
       if (doc.exists) {
         callback(doc.data());
+
+        console.log(doc.data());
       } else {
         callback(null);
       }
@@ -238,6 +241,15 @@ module.exports = class TeamMemberModel {
       return doc.data();
     } catch (err) {
       throw err;
+    }
+  }
+
+  static async deleteById(id) {
+    try {
+      await db.collection("teamMembers").doc(id.toString()).delete();
+      console.log(`Team with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting Team with ID ${id}:`, error);
     }
   }
 };

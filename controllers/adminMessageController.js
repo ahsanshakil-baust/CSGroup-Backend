@@ -54,12 +54,13 @@ const getAllMessage = async (req, res, next) => {
 
   const memberDetailsPromises = filteredMessage.map(async (el) => {
     const [member] = await Promise.all([
-      TeamMemberModel.teamMemberById(parseInt(el?.member_id)),
+      TeamMemberModel.teamMemberById(el.member_id),
     ]);
 
     return {
       ...el,
       ...member,
+      id: el.id,
     };
   });
 
@@ -69,14 +70,13 @@ const getAllMessage = async (req, res, next) => {
 
 const getMessage = (req, res, next) => {
   const { id } = req.params;
-  const convertedId = Number(id);
 
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    MessageModel.messageFindById(convertedId, (data) => {
+    MessageModel.messageFindById(id, (data) => {
       res.status(200).json({ data });
     });
   }
@@ -89,10 +89,12 @@ const deleteMessage = (req, res, next) => {
       error: "Need To Pass Id.",
     });
   } else {
-    const message = new MessageModel();
-    message.id = id;
-    message.status = 0;
-    message.save();
+    // const message = new MessageModel();
+    // message.id = id;
+    // message.status = 0;
+    // message.save();
+
+    MessageModel.deleteById(id);
     res.status(201).json({
       msg: "Message deleted successfully!",
     });

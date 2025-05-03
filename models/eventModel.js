@@ -112,17 +112,18 @@
 
 // EventModel.js
 const db = require("./firebase");
+const collectionName = "events";
 
 module.exports = class EventModel {
   constructor(
     title,
     location,
-    images,
-    videos,
+    images = [],
+    videos = [],
     date,
     serial,
     status = 1,
-    id = 0
+    id = null
   ) {
     this.id = id;
     this.title = title;
@@ -135,45 +136,55 @@ module.exports = class EventModel {
   }
 
   async save() {
-    const eventRef = db.collection("events").doc(String(this.id));
-
     try {
-      await eventRef.set({
-        title: this.title,
-        location: this.location,
-        images: this.images,
-        videos: this.videos,
-        date: this.date,
-        serial: this.serial,
-        status: this.status,
-      });
-      console.log("Event saved successfully to Firestore!");
-    } catch (err) {
-      console.error("Error saving event to Firestore:", err);
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      console.log("Event saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving event to Firebase:", error);
     }
   }
 
   static async getAllEvent(callback) {
-    const eventRef = db.collection("events");
-
     try {
-      const snapshot = await eventRef.get();
-      const eventData = snapshot.docs.map((doc) => doc.data());
-      callback(eventData);
-    } catch (err) {
-      console.error("Error reading events from Firestore:", err);
+      const snapshot = await db.collection(collectionName).get();
+      const events = snapshot.docs.map((doc) => doc.data());
+      callback(events);
+    } catch (error) {
+      console.error("Error retrieving events from Firebase:", error);
       callback([]);
     }
   }
 
   static async eventFindById(id, callback) {
     try {
-      const eventData = await EventModel.getAllEvent((data) => data);
-      const event = eventData.find((el) => el.id === id);
-      callback(event);
-    } catch (err) {
-      console.error("Error finding event by ID:", err);
+      const doc = await db.collection(collectionName).doc(id.toString()).get();
+      if (!doc.exists) {
+        callback(null);
+      } else {
+        callback(doc.data());
+      }
+    } catch (error) {
+      console.error("Error finding event by ID:", error);
       callback(null);
+    }
+  }
+
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Event with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting event with ID ${id}:`, error);
     }
   }
 };

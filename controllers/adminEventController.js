@@ -66,7 +66,7 @@ const getEventReels = (req, res, next) => {
 
 const getEvent = (req, res, next) => {
   const { id } = req.params;
-  const convertedId = Number(id);
+  const convertedId = id;
 
   if (!id) {
     res.status(500).json({
@@ -79,17 +79,18 @@ const getEvent = (req, res, next) => {
   }
 };
 
-const deleteEvent = (req, res, next) => {
+const deleteEvent = async (req, res, next) => {
   const { id } = req.body;
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    const event = new EventModel();
-    event.id = id;
-    event.status = 0;
-    event.save();
+    // const event = new EventModel();
+    // event.id = id;
+    // event.status = 0;
+    // event.save();
+    await EventModel.deleteById(id);
     res.status(201).json({
       msg: "Event deleted successfully!",
     });

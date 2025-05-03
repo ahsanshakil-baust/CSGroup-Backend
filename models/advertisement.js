@@ -121,4 +121,13 @@ module.exports = class Advertisement {
       callback({ type: "", url: "" });
     }
   }
+
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Ads with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting ads with ID ${id}:`, error);
+    }
+  }
 };

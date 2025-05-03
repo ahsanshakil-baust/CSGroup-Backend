@@ -95,10 +95,11 @@
 //   }
 // };
 
-const db = require("./firebase");
+const db = require("./firebase"); // your firebase.js initialized firestore instance
+const collectionName = "messages";
 
 module.exports = class MessageModel {
-  constructor(member_id, message, url = "", status = 1, id = 0) {
+  constructor(member_id, message, url = "", status = 1, id = null) {
     this.id = id;
     this.member_id = member_id;
     this.url = url;
@@ -106,56 +107,58 @@ module.exports = class MessageModel {
     this.status = status;
   }
 
-  async save(callback) {
+  async save() {
     try {
-      const messagesRef = db.collection("messages").doc(String(this.id));
+      let docRef;
 
-      if (this.id === 0) {
-        this.id = Date.now(); // Create a unique ID using timestamp
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
       }
 
-      await messagesRef.set({
-        member_id: this.member_id,
-        url: this.url,
-        message: this.message,
-        status: this.status,
-      });
-
-      console.log("Message saved successfully to Firestore!");
-      callback(this);
-    } catch (err) {
-      console.error("Error saving data to Firestore:", err);
+      console.log("Message saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving message to Firebase:", error);
     }
   }
 
-  static async getAllMessages(callback) {
+  static async getAllMessage(callback) {
     try {
-      const snapshot = await db.collection("messages").get();
-      const messages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        member_id: doc.data().member_id,
-        url: doc.data().url,
-        message: doc.data().message,
-        status: doc.data().status,
-      }));
+      const snapshot = await db.collection(collectionName).get();
+      const messages = snapshot.docs.map((doc) => doc.data());
+
       callback(messages);
-    } catch (err) {
-      console.error("Error reading from Firestore:", err);
+    } catch (error) {
+      console.error("Error retrieving messages from Firebase:", error);
       callback([]);
     }
   }
 
   static async messageFindById(id, callback) {
     try {
-      const doc = await db.collection("messages").doc(id).get();
-      if (doc.exists) {
-        callback(doc.data());
-      } else {
+      const doc = await db.collection(collectionName).doc(id).get();
+      if (!doc.exists) {
         callback(null);
+      } else {
+        callback(doc.data());
+        console.log(doc.data());
       }
-    } catch (err) {
-      console.error("Error fetching data from Firestore:", err);
+    } catch (error) {
+      console.error("Error finding message by ID:", error);
       callback(null);
+    }
+  }
+
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Message with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting message with ID ${id}:`, error);
     }
   }
 };

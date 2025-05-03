@@ -90,57 +90,66 @@
 // };
 
 const db = require("./firebase");
+const collectionName = "home_slider_reels";
 
 module.exports = class HomeSliderReelsModel {
-  constructor(title, url, status = 1, id = 0) {
+  constructor(title, url, status = 1, id = null) {
     this.id = id;
     this.title = title;
     this.url = url;
     this.status = status;
   }
 
-  async save(callback) {
-    const reelRef = db.collection("home_slider_reels").doc(String(this.id));
-
+  async save() {
     try {
-      await reelRef.set({
-        title: this.title,
-        url: this.url,
-        status: this.status,
-      });
-      console.log("Reel saved successfully to Firestore!");
-      callback({ id: this.id });
-    } catch (err) {
-      console.error("Error saving reel to Firestore:", err);
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      console.log("Reel saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving reel to Firebase:", error);
     }
   }
 
   static async getAllReels(callback) {
-    const reelRef = db.collection("home_slider_reels");
-
     try {
-      const snapshot = await reelRef.get();
+      const snapshot = await db.collection(collectionName).get();
       const reels = snapshot.docs.map((doc) => doc.data());
       callback(reels);
-    } catch (err) {
-      console.error("Error reading reels from Firestore:", err);
+    } catch (error) {
+      console.error("Error retrieving reels from Firebase:", error);
       callback([]);
     }
   }
 
   static async reelsFindById(id, callback) {
-    const reelRef = db.collection("home_slider_reels").doc(String(id));
-
     try {
-      const doc = await reelRef.get();
-      if (doc.exists) {
-        callback(doc.data());
-      } else {
+      const doc = await db.collection(collectionName).doc(id.toString()).get();
+      if (!doc.exists) {
         callback(null);
+      } else {
+        callback(doc.data());
       }
-    } catch (err) {
-      console.error("Error finding reel by ID:", err);
+    } catch (error) {
+      console.error("Error finding reel by ID:", error);
       callback(null);
+    }
+  }
+
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Reel with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting reel with ID ${id}:`, error);
     }
   }
 };

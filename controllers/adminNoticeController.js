@@ -45,7 +45,7 @@ const getAllNotice = (req, res, next) => {
 
 const getNotice = (req, res, next) => {
   const { id } = req.params;
-  const convertedId = Number(id);
+  const convertedId = id;
 
   if (!id) {
     res.status(500).json({
@@ -58,17 +58,18 @@ const getNotice = (req, res, next) => {
   }
 };
 
-const deleteNotice = (req, res, next) => {
+const deleteNotice = async (req, res, next) => {
   const { id } = req.body;
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    const notice = new NoticeModel();
-    notice.id = id;
-    notice.status = 0;
-    notice.save();
+    // const notice = new NoticeModel();
+    // notice.id = id;
+    // notice.status = 0;
+    // notice.save();
+    await NoticeModel.deleteById(id);
     res.status(201).json({
       msg: "Notice deleted successfully!",
     });

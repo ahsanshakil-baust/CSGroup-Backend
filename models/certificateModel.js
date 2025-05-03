@@ -179,4 +179,13 @@ module.exports = class CertificateModel {
       callback(null);
     }
   }
+
+  static async deleteById(id) {
+    try {
+      await db.collection("certificates").doc(id.toString()).delete();
+      console.log(`Certificate with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting certificate with ID ${id}:`, error);
+    }
+  }
 };
