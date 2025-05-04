@@ -107,76 +107,80 @@ const db = require("./firebase");
 const collectionName = "skills";
 
 module.exports = class SkillModel {
-  constructor(title, portfolio_id, status = 1, id = null) {
-    this.id = id;
-    this.title = title;
-    this.portfolio_id = portfolio_id;
-    this.status = status;
-  }
-
-  async save() {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      console.log("Skill saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving skill to Firebase:", error);
+    constructor(title, portfolio_id, status = 1, id = null) {
+        this.id = id;
+        this.title = title;
+        this.portfolio_id = portfolio_id;
+        this.status = status;
     }
-  }
 
-  static async getAllSkills(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const skills = snapshot.docs.map((doc) => doc.data());
-      callback(skills);
-    } catch (error) {
-      console.error("Error retrieving skills from Firebase:", error);
-      callback([]);
-    }
-  }
+    async save(callback) {
+        try {
+            let docRef;
 
-  static async skillFindById(portfolio_id) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const snapshot = await db
-          .collection(collectionName)
-          .where("portfolio_id", "==", portfolio_id)
-          .get();
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
 
-        const skills = snapshot.docs.map((doc) => doc.data());
-        resolve(skills);
-      } catch (error) {
-        console.error("Error finding skills by portfolio_id:", error);
-        reject(error);
-      }
-    });
-  }
-
-  static async skillById(id) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const doc = await db
-          .collection(collectionName)
-          .doc(id.toString())
-          .get();
-        if (!doc.exists) {
-          resolve(null);
-        } else {
-          resolve(doc.data());
+            if (callback) callback(this.id);
+            console.log("Skill saved successfully to Firebase.");
+        } catch (error) {
+            console.error("Error saving skill:", error);
         }
-      } catch (error) {
-        console.error("Error finding skill by ID:", error);
-        reject(error);
-      }
-    });
-  }
+    }
+
+    static async getAllSkills(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = snapshot.docs.map((doc) => doc.data());
+            callback(data);
+        } catch (error) {
+            console.error("Error fetching skills:", error);
+            callback([]);
+        }
+    }
+
+    static async skillFindByPortfolioId(portfolio_id) {
+        try {
+            const snapshot = await db
+                .collection(collectionName)
+                .where("portfolio_id", "==", portfolio_id)
+                .get();
+
+            const data = snapshot.docs.map((doc) => doc.data());
+            return data;
+        } catch (error) {
+            console.error("Error finding skills by portfolio ID:", error);
+            return [];
+        }
+    }
+
+    static async skillById(id) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+
+            if (!doc.exists) throw new Error("Skill not found");
+            return doc.data();
+        } catch (error) {
+            console.error("Error finding skill by ID:", error);
+            return null;
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Skill with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting skill with ID ${id}:`, error);
+        }
+    }
 };

@@ -124,65 +124,77 @@ const db = require("./firebase");
 const collectionName = "portfolios";
 
 module.exports = class PortfolioModel {
-  constructor(
-    member_id,
-    profession,
-    url,
-    email,
-    phone,
-    about,
-    status = 1,
-    id = null
-  ) {
-    this.id = id;
-    this.member_id = member_id;
-    this.profession = profession;
-    this.phone = phone;
-    this.url = url;
-    this.email = email;
-    this.about = about;
-    this.status = status;
-  }
-
-  async save(callback) {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      if (callback) callback(this.id);
-      console.log("Portfolio saved successfully to Firebase.");
-    } catch (error) {
-      console.error("Error saving portfolio:", error);
+    constructor(
+        member_id,
+        profession,
+        url,
+        email,
+        phone,
+        about,
+        status = 1,
+        id = null
+    ) {
+        this.id = id;
+        this.member_id = member_id;
+        this.profession = profession;
+        this.phone = phone;
+        this.url = url;
+        this.email = email;
+        this.about = about;
+        this.status = status;
     }
-  }
 
-  static async getAllPortfolio(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const data = snapshot.docs.map((doc) => doc.data());
-      callback(data);
-    } catch (error) {
-      console.error("Error fetching portfolios:", error);
-      callback([]);
-    }
-  }
+    async save(callback) {
+        try {
+            let docRef;
 
-  static async portfolioFindById(id) {
-    try {
-      const doc = await db.collection(collectionName).doc(id.toString()).get();
-      if (!doc.exists) throw new Error("No Portfolio found");
-      return doc.data();
-    } catch (error) {
-      console.error("Error finding portfolio:", error);
-      return null;
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            if (callback) callback(this.id);
+            console.log("Portfolio saved successfully to Firebase.");
+        } catch (error) {
+            console.error("Error saving portfolio:", error);
+        }
     }
-  }
+
+    static async getAllPortfolio(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = snapshot.docs.map((doc) => doc.data());
+            callback(data);
+        } catch (error) {
+            console.error("Error fetching portfolios:", error);
+            callback([]);
+        }
+    }
+
+    static async portfolioFindById(id) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+            if (!doc.exists) throw new Error("No Portfolio found");
+            return doc.data();
+        } catch (error) {
+            console.error("Error finding portfolio:", error);
+            return null;
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Portfolio with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting portfolio with ID ${id}:`, error);
+        }
+    }
 };

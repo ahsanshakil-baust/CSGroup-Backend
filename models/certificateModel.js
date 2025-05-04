@@ -104,88 +104,88 @@
 const db = require("./firebase");
 
 module.exports = class CertificateModel {
-  constructor(title, where, url, date, status = 1, id = 0) {
-    this.id = id;
-    this.title = title;
-    this.where = where;
-    this.url = url;
-    this.date = date;
-    this.status = status;
-  }
-
-  async save() {
-    const certificatesRef = db.collection("certificates");
-
-    try {
-      if (this.id > 0) {
-        // Update existing certificate
-        await certificatesRef.doc(this.id.toString()).set({
-          id: this.id,
-          title: this.title,
-          where: this.where,
-          url: this.url,
-          date: this.date,
-          status: this.status,
-        });
-        console.log("Certificate updated in Firestore!");
-      } else {
-        // Add new certificate
-        const snapshot = await certificatesRef.get();
-        this.id = snapshot.size + 1;
-
-        await certificatesRef.doc(this.id.toString()).set({
-          id: this.id,
-          title: this.title,
-          where: this.where,
-          url: this.url,
-          date: this.date,
-          status: this.status,
-        });
-        console.log("Certificate added to Firestore!");
-      }
-    } catch (err) {
-      console.error("Error saving certificate to Firestore:", err);
+    constructor(title, where, url, date, status = 1, id = 0) {
+        this.id = id;
+        this.title = title;
+        this.where = where;
+        this.url = url;
+        this.date = date;
+        this.status = status;
     }
-  }
 
-  static async getAllCertificate(callback) {
-    const certificatesRef = db.collection("certificates");
+    async save() {
+        const certificatesRef = db.collection("certificates");
 
-    try {
-      const snapshot = await certificatesRef.get();
-      const certificates = [];
-      snapshot.forEach((doc) => {
-        certificates.push(doc.data());
-      });
-      callback(certificates);
-    } catch (err) {
-      console.error("Error reading certificates from Firestore:", err);
-      callback([]);
+        try {
+            if (this.id > 0) {
+                // Update existing certificate
+                await certificatesRef.doc(this.id.toString()).set({
+                    id: this.id,
+                    title: this.title,
+                    where: this.where,
+                    url: this.url,
+                    date: this.date,
+                    status: this.status,
+                });
+                console.log("Certificate updated in Firestore!");
+            } else {
+                // Add new certificate
+                const snapshot = await certificatesRef.get();
+                this.id = snapshot.size + 1;
+
+                await certificatesRef.doc(this.id.toString()).set({
+                    id: this.id,
+                    title: this.title,
+                    where: this.where,
+                    url: this.url,
+                    date: this.date,
+                    status: this.status,
+                });
+                console.log("Certificate added to Firestore!");
+            }
+        } catch (err) {
+            console.error("Error saving certificate to Firestore:", err);
+        }
     }
-  }
 
-  static async certificateFindById(id, callback) {
-    const certificatesRef = db.collection("certificates");
+    static async getAllCertificate(callback) {
+        const certificatesRef = db.collection("certificates");
 
-    try {
-      const doc = await certificatesRef.doc(id.toString()).get();
-      if (doc.exists) {
-        callback(doc.data());
-      } else {
-        callback(null);
-      }
-    } catch (err) {
-      console.error("Error finding certificate by ID:", err);
-      callback(null);
+        try {
+            const snapshot = await certificatesRef.get();
+            const certificates = [];
+            snapshot.forEach((doc) => {
+                certificates.push(doc.data());
+            });
+            callback(certificates);
+        } catch (err) {
+            console.error("Error reading certificates from Firestore:", err);
+            callback([]);
+        }
     }
-  }
 
-  static async deleteById(id) {
-    try {
-      await db.collection("certificates").doc(id.toString()).delete();
-      console.log(`Certificate with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting certificate with ID ${id}:`, error);
+    static async certificateFindById(id, callback) {
+        const certificatesRef = db.collection("certificates");
+
+        try {
+            const doc = await certificatesRef.doc(id.toString()).get();
+            if (doc.exists) {
+                callback(doc.data());
+            } else {
+                callback(null);
+            }
+        } catch (err) {
+            console.error("Error finding certificate by ID:", err);
+            callback(null);
+        }
     }
-  }
+
+    static async deleteById(id) {
+        try {
+            await db.collection("certificates").doc(id.toString()).delete();
+            console.log(`Certificate with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting certificate with ID ${id}:`, error);
+        }
+    }
 };

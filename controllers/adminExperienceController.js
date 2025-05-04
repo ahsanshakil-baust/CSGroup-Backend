@@ -58,14 +58,16 @@ const getAllExperience = (req, res, next) => {
 
 const getExperience = async (req, res, next) => {
     const { id } = req.params;
-    const convertedId = Number(id);
+    const convertedId = id;
 
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        const response = await ExperienceModel.experienceFindById(convertedId);
+        const response = await ExperienceModel.experienceFindByPortfolioId(
+            convertedId
+        );
         const newDate = response.filter((el) => el.status != 0);
         res.status(200).json({ data: newDate });
     }
@@ -73,7 +75,7 @@ const getExperience = async (req, res, next) => {
 
 const getExperienceById = async (req, res, next) => {
     const { id } = req.params;
-    const convertedId = Number(id);
+    const convertedId = id;
 
     if (!id) {
         res.status(500).json({
@@ -85,17 +87,18 @@ const getExperienceById = async (req, res, next) => {
     }
 };
 
-const deleteExperience = (req, res, next) => {
+const deleteExperience = async (req, res, next) => {
     const { id } = req.body;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        const experience = new ExperienceModel();
-        experience.id = id;
-        experience.status = 0;
-        experience.save();
+        // const experience = new ExperienceModel();
+        // experience.id = id;
+        // experience.status = 0;
+        // experience.save();
+        await ExperienceModel.deleteById(id);
         res.status(201).json({
             msg: "Experience deleted successfully!",
         });

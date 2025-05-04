@@ -138,83 +138,96 @@
 
 // EducationModel.js
 const db = require("./firebase");
+const collectionName = "education";
 
 module.exports = class EducationModel {
-  constructor(
-    title,
-    profession,
-    institution,
-    about,
-    date_duration,
-    portfolio_id,
-    status = 1,
-    id = 0
-  ) {
-    this.id = id;
-    this.title = title;
-    this.profession = profession;
-    this.institution = institution;
-    this.about = about;
-    this.date_duration = date_duration;
-    this.portfolio_id = portfolio_id;
-    this.status = status;
-  }
-
-  async save() {
-    const educationRef = db.collection("education").doc(String(this.id));
-
-    try {
-      await educationRef.set({
-        title: this.title,
-        profession: this.profession,
-        institution: this.institution,
-        about: this.about,
-        date_duration: this.date_duration,
-        portfolio_id: this.portfolio_id,
-        status: this.status,
-      });
-      console.log("Education saved successfully to Firestore!");
-    } catch (err) {
-      console.error("Error saving education to Firestore:", err);
+    constructor(
+        title,
+        profession,
+        institution,
+        about,
+        date_duration,
+        portfolio_id,
+        status = 1,
+        id = null
+    ) {
+        this.id = id;
+        this.title = title;
+        this.profession = profession;
+        this.institution = institution;
+        this.about = about;
+        this.date_duration = date_duration;
+        this.portfolio_id = portfolio_id;
+        this.status = status;
     }
-  }
 
-  static async getAllEducation(callback) {
-    const educationRef = db.collection("education");
+    async save(callback) {
+        try {
+            let docRef;
 
-    try {
-      const snapshot = await educationRef.get();
-      const educationData = snapshot.docs.map((doc) => doc.data());
-      callback(educationData);
-    } catch (err) {
-      console.error("Error reading education from Firestore:", err);
-      callback([]);
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            if (callback) callback(this.id);
+            console.log("Education saved successfully to Firebase.");
+        } catch (error) {
+            console.error("Error saving education:", error);
+        }
     }
-  }
 
-  static async educationFindById(id, callback) {
-    try {
-      const educationData = await EducationModel.getAllEducation(
-        (data) => data
-      );
-      const filteredData = educationData.filter((el) => el.portfolio_id == id);
-      callback(filteredData.length > 0 ? filteredData[0] : null);
-    } catch (err) {
-      console.error("Error finding education by ID:", err);
-      callback(null);
+    static async getAllEducation(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = snapshot.docs.map((doc) => doc.data());
+            callback(data);
+        } catch (error) {
+            console.error("Error fetching education entries:", error);
+            callback([]);
+        }
     }
-  }
 
-  static async educationById(id, callback) {
-    try {
-      const educationData = await EducationModel.getAllEducation(
-        (data) => data
-      );
-      const foundEducation = educationData.find((el) => el.id == id);
-      callback(foundEducation || null);
-    } catch (err) {
-      console.error("Error finding education by ID:", err);
-      callback(null);
+    static async educationFindByPortfolioId(portfolio_id) {
+        try {
+            const snapshot = await db
+                .collection(collectionName)
+                .where("portfolio_id", "==", portfolio_id)
+                .get();
+
+            const data = snapshot.docs.map((doc) => doc.data());
+            return data;
+        } catch (error) {
+            console.error("Error finding education by portfolio_id:", error);
+            return [];
+        }
     }
-  }
+
+    static async educationById(id) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+
+            if (!doc.exists) throw new Error("No Education entry found");
+            return doc.data();
+        } catch (error) {
+            console.error("Error finding education by ID:", error);
+            return null;
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Education with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting education with ID ${id}:`, error);
+        }
+    }
 };
