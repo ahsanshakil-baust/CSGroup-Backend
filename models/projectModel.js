@@ -155,76 +155,81 @@ const db = require("./firebase");
 const collectionName = "projects";
 
 module.exports = class ProjectModel {
-  constructor(
-    name,
-    project_type,
-    location,
-    description,
-    land_videos,
-    project_images,
-    map_url,
-    project_structure,
-    city,
-    available,
-    category,
-    id = null,
-    status = 1
-  ) {
-    this.id = id;
-    this.name = name;
-    this.project_type = project_type;
-    this.location = location;
-    this.description = description;
-    this.land_videos = land_videos;
-    this.project_images = project_images;
-    this.map_url = map_url;
-    this.project_structure = project_structure;
-    this.city = city;
-    this.available = available;
-    this.category = category;
-    this.status = status;
-  }
-
-  async save(callback) {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      if (callback) callback(this.id);
-
-      console.log("Project saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving project to Firebase:", error);
+    constructor(
+        name,
+        project_type,
+        location,
+        description,
+        land_videos = [],
+        project_images = [],
+        map_url,
+        project_structure,
+        city,
+        // available,
+        category,
+        feature_images = [],
+        id = null,
+        status = 1
+    ) {
+        this.id = id;
+        this.name = name;
+        this.project_type = project_type;
+        this.location = location;
+        this.description = description;
+        this.land_videos = land_videos;
+        this.project_images = project_images;
+        this.map_url = map_url;
+        this.project_structure = project_structure;
+        this.city = city;
+        // this.available = available;
+        this.category = category;
+        this.feature_images = feature_images;
+        this.status = status;
     }
-  }
 
-  static async getAllProjects(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const projects = snapshot.docs.map((doc) => doc.data());
-      callback(projects);
-    } catch (error) {
-      console.error("Error fetching projects from Firebase:", error);
-      callback([]);
-    }
-  }
+    async save(callback) {
+        try {
+            let docRef;
 
-  static async projectFindById(id) {
-    try {
-      const doc = await db.collection(collectionName).doc(id.toString()).get();
-      if (!doc.exists) return null;
-      return doc.data();
-    } catch (error) {
-      console.error("Error finding project by ID:", error);
-      return null;
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            if (callback) callback(this.id);
+
+            console.log("Project saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving project to Firebase:", error);
+        }
     }
-  }
+
+    static async getAllProjects(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const projects = snapshot.docs.map((doc) => doc.data());
+            callback(projects);
+        } catch (error) {
+            console.error("Error fetching projects from Firebase:", error);
+            callback([]);
+        }
+    }
+
+    static async projectFindById(id) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+            if (!doc.exists) return null;
+            return doc.data();
+        } catch (error) {
+            console.error("Error finding project by ID:", error);
+            return null;
+        }
+    }
 };

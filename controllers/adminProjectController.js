@@ -81,9 +81,13 @@ const addProject = (req, res, next) => {
         map_url,
         project_structure,
         city,
-        available,
+        // available,
         category,
+        feature_images,
     } = req.body;
+
+    console.log(city);
+
     if (name == "") {
         res.status(500).json({
             error: "Need to fill all necessary fields.",
@@ -99,8 +103,9 @@ const addProject = (req, res, next) => {
             map_url,
             project_structure,
             city,
-            available,
-            category
+            // available,
+            category,
+            feature_images
         );
         project.save((id) =>
             res.status(201).json({
@@ -122,8 +127,9 @@ const updateProject = (req, res, next) => {
         map_url,
         project_structure,
         city,
-        available,
+        // available,
         category,
+        feature_images,
     } = req.body;
 
     if (!id) {
@@ -141,8 +147,9 @@ const updateProject = (req, res, next) => {
             map_url,
             project_structure,
             city,
-            available,
-            category
+            // available,
+            category,
+            feature_images
         );
         project.id = id;
         project.save((id) =>
