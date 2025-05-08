@@ -29,7 +29,7 @@ const getOwner = async (req, res, next) => {
         }
 
         // Fetch owner details using async/await
-        const ownerData = await OwnerModel.ownerFindById(parseInt(id));
+        const ownerData = await OwnerModel.ownerFindById(id);
 
         // If no owner is found, return a 404 response
         if (!ownerData) {

@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1V3E3tP1x_c_88gNE972V_BXC8rpA63FbGAY_83rHhto";
 // const range = "Sheet1!A:H";
@@ -137,7 +139,8 @@
 // };
 
 // EducationModel.js
-const db = require("./firebase");
+// const db = require("./firebase2");
+const db = apps.app2.firestore();
 const collectionName = "education";
 
 module.exports = class EducationModel {

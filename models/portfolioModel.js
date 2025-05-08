@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1jIecqz5ahDB59hg3eISUvShB-u8p2oRTPvcjLizq6tQ";
 // const range = "Sheet1!A:H";
@@ -120,7 +122,9 @@
 //     }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app2.firestore();
+
 const collectionName = "portfolios";
 
 module.exports = class PortfolioModel {

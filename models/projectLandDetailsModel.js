@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "18JQuTKmCnVBaHezY9qHeGrzvQ0uOxY0LSPsFBcy5ihU";
 // const range = "Sheet1!A:G";
@@ -125,74 +127,75 @@
 //     }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app3.firestore();
 const collectionName = "projectLandDetails";
 
 module.exports = class ProjectLandDetailsModel {
-  constructor(
-    area,
-    building_height,
-    total_share,
-    total_sqf,
-    project_id,
-    status = 1,
-    id = null
-  ) {
-    this.id = id;
-    this.area = area;
-    this.building_height = building_height;
-    this.total_share = total_share;
-    this.total_sqf = total_sqf;
-    this.project_id = project_id;
-    this.status = status;
-  }
-
-  async save(callback) {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      if (callback) callback({ id: this.id });
-
-      console.log("Project Land Details saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving project land details:", error);
+    constructor(
+        area,
+        building_height,
+        total_share,
+        total_sqf,
+        project_id,
+        status = 1,
+        id = null
+    ) {
+        this.id = id;
+        this.area = area;
+        this.building_height = building_height;
+        this.total_share = total_share;
+        this.total_sqf = total_sqf;
+        this.project_id = project_id;
+        this.status = status;
     }
-  }
 
-  static async getAllProjectLand(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const data = snapshot.docs.map((doc) => doc.data());
-      callback(data);
-    } catch (error) {
-      console.error("Error fetching project land details:", error);
-      callback([]);
+    async save(callback) {
+        try {
+            let docRef;
+
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            if (callback) callback({ id: this.id });
+
+            console.log("Project Land Details saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving project land details:", error);
+        }
     }
-  }
 
-  static async projectLandFindById(projectId) {
-    try {
-      const snapshot = await db
-        .collection(collectionName)
-        .where("project_id", "==", projectId)
-        .get();
-
-      if (snapshot.empty) return null;
-
-      // Assuming only one land detail per project
-      return snapshot.docs[0].data();
-    } catch (error) {
-      console.error("Error finding project land by ID:", error);
-      return null;
+    static async getAllProjectLand(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = snapshot.docs.map((doc) => doc.data());
+            callback(data);
+        } catch (error) {
+            console.error("Error fetching project land details:", error);
+            callback([]);
+        }
     }
-  }
+
+    static async projectLandFindById(projectId) {
+        try {
+            const snapshot = await db
+                .collection(collectionName)
+                .where("project_id", "==", projectId)
+                .get();
+
+            if (snapshot.empty) return null;
+
+            // Assuming only one land detail per project
+            return snapshot.docs[0].data();
+        } catch (error) {
+            console.error("Error finding project land by ID:", error);
+            return null;
+        }
+    }
 };

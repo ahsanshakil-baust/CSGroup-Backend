@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "18ADH7-Q-DRZGFa3by74EE_Q6_-b--ezvOPmec-b3Xyo";
 // const range = "Sheet1!A:O";
@@ -154,99 +156,100 @@
 //     }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app4.firestore();
 const collectionName = "share_land_details";
 
 module.exports = class ShareLandDetailsModel {
-  constructor(
-    area,
-    building_height,
-    total_share,
-    total_sqf,
-    net_sqf,
-    price,
-    reg_cost,
-    khariz_cost,
-    other_cost,
-    total_price,
-    share_id,
-    total_floor,
-    total_flat,
-    id = null,
-    status = 1
-  ) {
-    this.id = id;
-    this.area = area;
-    this.building_height = building_height;
-    this.total_share = total_share;
-    this.total_sqf = total_sqf;
-    this.net_sqf = net_sqf;
-    this.price = price;
-    this.reg_cost = reg_cost;
-    this.khariz_cost = khariz_cost;
-    this.other_cost = other_cost;
-    this.total_price = total_price;
-    this.share_id = share_id;
-    this.total_floor = total_floor;
-    this.total_flat = total_flat;
-    this.status = status;
-  }
-
-  async save(callback) {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      if (callback) {
-        callback({
-          id: this.id,
-          share_id: parseInt(this.share_id),
-        });
-      }
-
-      console.log("Land detail saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving land detail to Firebase:", error);
+    constructor(
+        area,
+        building_height,
+        total_share,
+        total_sqf,
+        net_sqf,
+        price,
+        reg_cost,
+        khariz_cost,
+        other_cost,
+        total_price,
+        share_id,
+        total_floor,
+        total_flat,
+        id = null,
+        status = 1
+    ) {
+        this.id = id;
+        this.area = area;
+        this.building_height = building_height;
+        this.total_share = total_share;
+        this.total_sqf = total_sqf;
+        this.net_sqf = net_sqf;
+        this.price = price;
+        this.reg_cost = reg_cost;
+        this.khariz_cost = khariz_cost;
+        this.other_cost = other_cost;
+        this.total_price = total_price;
+        this.share_id = share_id;
+        this.total_floor = total_floor;
+        this.total_flat = total_flat;
+        this.status = status;
     }
-  }
 
-  static async getAllLandDetails(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const lands = snapshot.docs.map((doc) => doc.data());
-      callback(lands);
-    } catch (error) {
-      console.error("Error fetching land details from Firebase:", error);
-      callback([]);
-    }
-  }
+    async save(callback) {
+        try {
+            let docRef;
 
-  static async landFindById(share_id) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const snapshot = await db
-          .collection(collectionName)
-          .where("share_id", "==", share_id.toString())
-          .get();
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
 
-        if (snapshot.empty) {
-          return resolve(null);
+            if (callback) {
+                callback({
+                    id: this.id,
+                    share_id: parseInt(this.share_id),
+                });
+            }
+
+            console.log("Land detail saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving land detail to Firebase:", error);
         }
+    }
 
-        const land = snapshot.docs[0].data();
-        resolve(land);
-      } catch (error) {
-        console.error("Error finding land detail by share_id:", error);
-        reject(error);
-      }
-    });
-  }
+    static async getAllLandDetails(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const lands = snapshot.docs.map((doc) => doc.data());
+            callback(lands);
+        } catch (error) {
+            console.error("Error fetching land details from Firebase:", error);
+            callback([]);
+        }
+    }
+
+    static async landFindById(share_id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const snapshot = await db
+                    .collection(collectionName)
+                    .where("share_id", "==", share_id.toString())
+                    .get();
+
+                if (snapshot.empty) {
+                    return resolve(null);
+                }
+
+                const land = snapshot.docs[0].data();
+                resolve(land);
+            } catch (error) {
+                console.error("Error finding land detail by share_id:", error);
+                reject(error);
+            }
+        });
+    }
 };

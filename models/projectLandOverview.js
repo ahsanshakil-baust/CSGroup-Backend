@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "13M6wC7QupJH-fA_mBY5aNHOsvIW5SOyEZzFVA-A88ws";
 // const range = "Sheet1!A:O";
@@ -143,90 +145,91 @@
 //   }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app3.firestore();
 const collectionName = "projectOverviews";
 
 module.exports = class ProjectOverviewModel {
-  constructor(
-    unit,
-    floors,
-    generator,
-    flats,
-    lift,
-    car_parking,
-    community_center,
-    stair,
-    cctv,
-    security_guard,
-    others_facilities,
-    project_id,
-    basement,
-    status = 1,
-    id = null
-  ) {
-    this.id = id;
-    this.unit = unit;
-    this.floors = floors;
-    this.generator = generator;
-    this.flats = flats;
-    this.lift = lift;
-    this.car_parking = car_parking;
-    this.community_center = community_center;
-    this.stair = stair;
-    this.cctv = cctv;
-    this.security_guard = security_guard;
-    this.others_facilities = others_facilities;
-    this.project_id = project_id;
-    this.basement = basement;
-    this.status = status;
-  }
-
-  async save(callback) {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      if (callback) callback({ id: this.id });
-
-      console.log("Project Overview saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving Project Overview:", error);
+    constructor(
+        unit,
+        floors,
+        generator,
+        flats,
+        lift,
+        car_parking,
+        community_center,
+        stair,
+        cctv,
+        security_guard,
+        others_facilities,
+        project_id,
+        basement,
+        status = 1,
+        id = null
+    ) {
+        this.id = id;
+        this.unit = unit;
+        this.floors = floors;
+        this.generator = generator;
+        this.flats = flats;
+        this.lift = lift;
+        this.car_parking = car_parking;
+        this.community_center = community_center;
+        this.stair = stair;
+        this.cctv = cctv;
+        this.security_guard = security_guard;
+        this.others_facilities = others_facilities;
+        this.project_id = project_id;
+        this.basement = basement;
+        this.status = status;
     }
-  }
 
-  static async getAllOverview(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const data = snapshot.docs.map((doc) => doc.data());
-      callback(data);
-    } catch (error) {
-      console.error("Error fetching project overviews:", error);
-      callback([]);
+    async save(callback) {
+        try {
+            let docRef;
+
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            if (callback) callback({ id: this.id });
+
+            console.log("Project Overview saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving Project Overview:", error);
+        }
     }
-  }
 
-  static async overviewFindById(projectId) {
-    try {
-      const snapshot = await db
-        .collection(collectionName)
-        .where("project_id", "==", projectId)
-        .get();
-
-      if (snapshot.empty) return null;
-
-      // Assuming one overview per project
-      return snapshot.docs[0].data();
-    } catch (error) {
-      console.error("Error finding project overview:", error);
-      return null;
+    static async getAllOverview(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = snapshot.docs.map((doc) => doc.data());
+            callback(data);
+        } catch (error) {
+            console.error("Error fetching project overviews:", error);
+            callback([]);
+        }
     }
-  }
+
+    static async overviewFindById(projectId) {
+        try {
+            const snapshot = await db
+                .collection(collectionName)
+                .where("project_id", "==", projectId)
+                .get();
+
+            if (snapshot.empty) return null;
+
+            // Assuming one overview per project
+            return snapshot.docs[0].data();
+        } catch (error) {
+            console.error("Error finding project overview:", error);
+            return null;
+        }
+    }
 };

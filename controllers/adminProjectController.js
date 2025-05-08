@@ -26,7 +26,7 @@ const getAllProject = async (req, res, next) => {
 
 const getProject = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             return res.status(400).json({ error: "Need To Pass Id." });
@@ -85,8 +85,6 @@ const addProject = (req, res, next) => {
         category,
         feature_images,
     } = req.body;
-
-    console.log(city);
 
     if (name == "") {
         res.status(500).json({

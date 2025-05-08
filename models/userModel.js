@@ -1,6 +1,8 @@
 // const { google } = require("googleapis");
 // const credentials = require("./credentials.json");
 
+const apps = require("./firebase");
+
 // const sheetId = "1fzbppdeHL76Mumgy1uR_8tK48TMNI3pqHKsZKdIJ0hA";
 // const range = "Sheet1!A:E"; // Assuming columns: ID, Name, Email, Password
 
@@ -100,87 +102,88 @@
 // };
 
 // User.js
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 
 module.exports = class User {
-  constructor(member_id, email, password, status = 0) {
-    this.id = 0;
-    this.member_id = member_id;
-    this.email = email;
-    this.password = password;
-    this.status = status;
-  }
-
-  async save() {
-    const usersRef = db.collection("users");
-
-    if (this.id > 0) {
-      // Update existing user by ID
-      const userDoc = await usersRef.doc(this.id.toString()).get();
-      if (userDoc.exists) {
-        await usersRef.doc(this.id.toString()).set({
-          id: this.id,
-          member_id: this.member_id,
-          email: this.email,
-          password: this.password,
-          status: this.status,
-        });
-        console.log("User updated successfully in Firestore!");
-      } else {
-        console.error("User with this ID does not exist.");
-      }
-    } else {
-      // Add new user
-      const snapshot = await usersRef.get();
-      this.id = snapshot.size + 1;
-      await usersRef.doc(this.id.toString()).set({
-        id: this.id,
-        member_id: this.member_id,
-        email: this.email,
-        password: this.password,
-        status: this.status,
-      });
-      console.log("User added successfully to Firestore!");
+    constructor(member_id, email, password, status = 0) {
+        this.id = 0;
+        this.member_id = member_id;
+        this.email = email;
+        this.password = password;
+        this.status = status;
     }
-  }
 
-  static async getAllUser(callback) {
-    try {
-      const usersRef = db.collection("users");
-      const snapshot = await usersRef.get();
-      const users = [];
-      snapshot.forEach((doc) => {
-        users.push(doc.data());
-      });
-      callback(users);
-    } catch (err) {
-      console.error("Error fetching users from Firestore:", err);
-      callback([]);
+    async save() {
+        const usersRef = db.collection("users");
+
+        if (this.id > 0) {
+            // Update existing user by ID
+            const userDoc = await usersRef.doc(this.id.toString()).get();
+            if (userDoc.exists) {
+                await usersRef.doc(this.id.toString()).set({
+                    id: this.id,
+                    member_id: this.member_id,
+                    email: this.email,
+                    password: this.password,
+                    status: this.status,
+                });
+                console.log("User updated successfully in Firestore!");
+            } else {
+                console.error("User with this ID does not exist.");
+            }
+        } else {
+            // Add new user
+            const snapshot = await usersRef.get();
+            this.id = snapshot.size + 1;
+            await usersRef.doc(this.id.toString()).set({
+                id: this.id,
+                member_id: this.member_id,
+                email: this.email,
+                password: this.password,
+                status: this.status,
+            });
+            console.log("User added successfully to Firestore!");
+        }
     }
-  }
 
-  static async getUserByEmail(email, callback) {
-    try {
-      const usersRef = db.collection("users");
-      const snapshot = await usersRef
-        .where("email", "==", email)
-        .where("status", "==", 1)
-        .get();
-
-      if (!snapshot.empty) {
-        const userDoc = snapshot.docs[0];
-        const user = userDoc.data();
-        callback({
-          id: user.id,
-          member_id: user.member_id,
-          email: user.email,
-        });
-      } else {
-        callback({ error: "No user exists!" });
-      }
-    } catch (err) {
-      console.error("Error finding user by email:", err);
-      callback({ error: "Error occurred while retrieving user." });
+    static async getAllUser(callback) {
+        try {
+            const usersRef = db.collection("users");
+            const snapshot = await usersRef.get();
+            const users = [];
+            snapshot.forEach((doc) => {
+                users.push(doc.data());
+            });
+            callback(users);
+        } catch (err) {
+            console.error("Error fetching users from Firestore:", err);
+            callback([]);
+        }
     }
-  }
+
+    static async getUserByEmail(email, callback) {
+        try {
+            const usersRef = db.collection("users");
+            const snapshot = await usersRef
+                .where("email", "==", email)
+                .where("status", "==", 1)
+                .get();
+
+            if (!snapshot.empty) {
+                const userDoc = snapshot.docs[0];
+                const user = userDoc.data();
+                callback({
+                    id: user.id,
+                    member_id: user.member_id,
+                    email: user.email,
+                });
+            } else {
+                callback({ error: "No user exists!" });
+            }
+        } catch (err) {
+            console.error("Error finding user by email:", err);
+            callback({ error: "Error occurred while retrieving user." });
+        }
+    }
 };

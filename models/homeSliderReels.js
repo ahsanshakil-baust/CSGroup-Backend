@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1sFkTrFC_qgIpCPCHoR_xrwNsUyFIWJS89Gl_Nqyp2ko";
 // const range = "Sheet1!A:D";
@@ -89,67 +91,71 @@
 //   }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 const collectionName = "home_slider_reels";
 
 module.exports = class HomeSliderReelsModel {
-  constructor(title, url, status = 1, id = null) {
-    this.id = id;
-    this.title = title;
-    this.url = url;
-    this.status = status;
-  }
-
-  async save() {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      console.log("Reel saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving reel to Firebase:", error);
+    constructor(title, url, status = 1, id = null) {
+        this.id = id;
+        this.title = title;
+        this.url = url;
+        this.status = status;
     }
-  }
 
-  static async getAllReels(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const reels = snapshot.docs.map((doc) => doc.data());
-      callback(reels);
-    } catch (error) {
-      console.error("Error retrieving reels from Firebase:", error);
-      callback([]);
-    }
-  }
+    async save() {
+        try {
+            let docRef;
 
-  static async reelsFindById(id, callback) {
-    try {
-      const doc = await db.collection(collectionName).doc(id.toString()).get();
-      if (!doc.exists) {
-        callback(null);
-      } else {
-        callback(doc.data());
-      }
-    } catch (error) {
-      console.error("Error finding reel by ID:", error);
-      callback(null);
-    }
-  }
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
 
-  static async deleteById(id) {
-    try {
-      await db.collection(collectionName).doc(id.toString()).delete();
-      console.log(`Reel with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting reel with ID ${id}:`, error);
+            console.log("Reel saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving reel to Firebase:", error);
+        }
     }
-  }
+
+    static async getAllReels(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const reels = snapshot.docs.map((doc) => doc.data());
+            callback(reels);
+        } catch (error) {
+            console.error("Error retrieving reels from Firebase:", error);
+            callback([]);
+        }
+    }
+
+    static async reelsFindById(id, callback) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+            if (!doc.exists) {
+                callback(null);
+            } else {
+                callback(doc.data());
+            }
+        } catch (error) {
+            console.error("Error finding reel by ID:", error);
+            callback(null);
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Reel with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting reel with ID ${id}:`, error);
+        }
+    }
 };

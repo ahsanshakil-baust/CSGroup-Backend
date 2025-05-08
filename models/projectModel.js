@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1bNctI7iJgqm_wodJ27GDte9Mx-jOc2ekidvNceAGu7o";
 // const range = "Sheet1!A:M";
@@ -151,7 +153,8 @@
 //     }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app3.firestore();
 const collectionName = "projects";
 
 module.exports = class ProjectModel {

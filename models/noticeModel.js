@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1e1M7PECBEC0Mu9h7THbCVwjAqB1918tSAqAAcUm86lA";
 // const range = "Sheet1!A:H";
@@ -110,80 +112,84 @@
 //   }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 const collectionName = "notices";
 
 module.exports = class NoticeModel {
-  constructor(
-    title,
-    url,
-    date,
-    type,
-    text = "",
-    signatory,
-    status = 1,
-    id = null
-  ) {
-    this.id = id;
-    this.title = title;
-    this.url = url;
-    this.date = date;
-    this.type = type;
-    this.text = text;
-    this.signatory = signatory;
-    this.status = status;
-  }
-
-  async save() {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      console.log("Notice saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving notice to Firebase:", error);
+    constructor(
+        title,
+        url,
+        date,
+        type,
+        text = "",
+        signatory,
+        status = 1,
+        id = null
+    ) {
+        this.id = id;
+        this.title = title;
+        this.url = url;
+        this.date = date;
+        this.type = type;
+        this.text = text;
+        this.signatory = signatory;
+        this.status = status;
     }
-  }
 
-  static async getAllNotice(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const notices = snapshot.docs.map((doc) => doc.data());
-      callback(notices);
-    } catch (error) {
-      console.error("Error retrieving notices from Firebase:", error);
-      callback([]);
-    }
-  }
+    async save() {
+        try {
+            let docRef;
 
-  static async noticeFindById(id, callback) {
-    try {
-      const doc = await db.collection(collectionName).doc(id.toString()).get();
-      if (!doc.exists) {
-        callback(null);
-      } else {
-        callback(doc.data());
-      }
-    } catch (error) {
-      console.error("Error finding notice by ID:", error);
-      callback(null);
-    }
-  }
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
 
-  static async deleteById(id) {
-    try {
-      await db.collection(collectionName).doc(id.toString()).delete();
-      console.log(`Notice with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting notice with ID ${id}:`, error);
+            console.log("Notice saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving notice to Firebase:", error);
+        }
     }
-  }
+
+    static async getAllNotice(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const notices = snapshot.docs.map((doc) => doc.data());
+            callback(notices);
+        } catch (error) {
+            console.error("Error retrieving notices from Firebase:", error);
+            callback([]);
+        }
+    }
+
+    static async noticeFindById(id, callback) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+            if (!doc.exists) {
+                callback(null);
+            } else {
+                callback(doc.data());
+            }
+        } catch (error) {
+            console.error("Error finding notice by ID:", error);
+            callback(null);
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Notice with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting notice with ID ${id}:`, error);
+        }
+    }
 };

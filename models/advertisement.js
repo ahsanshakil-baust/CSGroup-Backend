@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "12ZuR4kgLRooMHw0R9Ud8J7Qf6mxhrn-13yTeUc0cca8";
 // const range = "Sheet1!A1:B";
@@ -65,69 +67,70 @@
 // };
 
 // Advertisement.js
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 
 module.exports = class Advertisement {
-  constructor(type, url) {
-    this.type = type;
-    this.url = url;
-  }
-
-  async save() {
-    const adsRef = db.collection("advertisements");
-
-    try {
-      // Check if there is already an ad stored
-      const snapshot = await adsRef.get();
-
-      if (snapshot.empty) {
-        // If no ad exists, add the first one
-        await adsRef.add({
-          type: this.type,
-          url: this.url,
-        });
-        console.log("Advertisement added to Firestore!");
-      } else {
-        // If ad exists, update it
-        const doc = snapshot.docs[0];
-        await adsRef.doc(doc.id).set({
-          type: this.type,
-          url: this.url,
-        });
-        console.log("Advertisement updated in Firestore!");
-      }
-    } catch (err) {
-      console.error("Error saving advertisement to Firestore:", err);
+    constructor(type, url) {
+        this.type = type;
+        this.url = url;
     }
-  }
 
-  static async getAds(callback) {
-    const adsRef = db.collection("advertisements");
+    async save() {
+        const adsRef = db.collection("advertisements");
 
-    try {
-      const snapshot = await adsRef.get();
+        try {
+            // Check if there is already an ad stored
+            const snapshot = await adsRef.get();
 
-      if (!snapshot.empty) {
-        const doc = snapshot.docs[0].data();
-        callback({
-          type: doc.type || "",
-          url: doc.url || "",
-        });
-      } else {
-        callback({ type: "", url: "" });
-      }
-    } catch (err) {
-      console.error("Error reading advertisement from Firestore:", err);
-      callback({ type: "", url: "" });
+            if (snapshot.empty) {
+                // If no ad exists, add the first one
+                await adsRef.add({
+                    type: this.type,
+                    url: this.url,
+                });
+                console.log("Advertisement added to Firestore!");
+            } else {
+                // If ad exists, update it
+                const doc = snapshot.docs[0];
+                await adsRef.doc(doc.id).set({
+                    type: this.type,
+                    url: this.url,
+                });
+                console.log("Advertisement updated in Firestore!");
+            }
+        } catch (err) {
+            console.error("Error saving advertisement to Firestore:", err);
+        }
     }
-  }
 
-  static async deleteById(id) {
-    try {
-      await db.collection(collectionName).doc(id.toString()).delete();
-      console.log(`Ads with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting ads with ID ${id}:`, error);
+    static async getAds(callback) {
+        const adsRef = db.collection("advertisements");
+
+        try {
+            const snapshot = await adsRef.get();
+
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0].data();
+                callback({
+                    type: doc.type || "",
+                    url: doc.url || "",
+                });
+            } else {
+                callback({ type: "", url: "" });
+            }
+        } catch (err) {
+            console.error("Error reading advertisement from Firestore:", err);
+            callback({ type: "", url: "" });
+        }
     }
-  }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Ads with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting ads with ID ${id}:`, error);
+        }
+    }
 };

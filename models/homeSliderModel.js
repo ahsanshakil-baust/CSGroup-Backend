@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1BwR9akqSatx0-gentq8HOe6QXU5Q5niX7bAxvYFRfi0";
 // const range = "Sheet1!A1:C";
@@ -91,66 +93,70 @@
 //   }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 const collectionName = "home_sliders";
 
 module.exports = class HomeSliders {
-  constructor(url, status = 1, id = null) {
-    this.id = id;
-    this.url = url;
-    this.status = status;
-  }
-
-  async save() {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      console.log("Slider saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving slider to Firebase:", error);
+    constructor(url, status = 1, id = null) {
+        this.id = id;
+        this.url = url;
+        this.status = status;
     }
-  }
 
-  static async getAllSlider(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const sliders = snapshot.docs.map((doc) => doc.data());
-      callback(sliders);
-    } catch (error) {
-      console.error("Error retrieving sliders from Firebase:", error);
-      callback([]);
-    }
-  }
+    async save() {
+        try {
+            let docRef;
 
-  static async sliderFindById(id, callback) {
-    try {
-      const doc = await db.collection(collectionName).doc(id.toString()).get();
-      if (!doc.exists) {
-        callback(null);
-      } else {
-        callback(doc.data());
-      }
-    } catch (error) {
-      console.error("Error finding slider by ID:", error);
-      callback(null);
-    }
-  }
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
 
-  static async deleteById(id) {
-    try {
-      await db.collection(collectionName).doc(id.toString()).delete();
-      console.log(`Slider with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting slider with ID ${id}:`, error);
+            console.log("Slider saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving slider to Firebase:", error);
+        }
     }
-  }
+
+    static async getAllSlider(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const sliders = snapshot.docs.map((doc) => doc.data());
+            callback(sliders);
+        } catch (error) {
+            console.error("Error retrieving sliders from Firebase:", error);
+            callback([]);
+        }
+    }
+
+    static async sliderFindById(id, callback) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+            if (!doc.exists) {
+                callback(null);
+            } else {
+                callback(doc.data());
+            }
+        } catch (error) {
+            console.error("Error finding slider by ID:", error);
+            callback(null);
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Slider with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting slider with ID ${id}:`, error);
+        }
+    }
 };

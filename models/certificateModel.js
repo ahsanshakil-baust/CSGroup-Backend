@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1mUbEG2jWbTkGqdUDdo66ZZ2UBdfL98Tr9kS3grCX9EQ";
 // const range = "Sheet1!A:F";
@@ -101,7 +103,9 @@
 // };
 
 // CertificateModel.js
-const db = require("./firebase");
+// const db = require("./firebase");
+
+const db = apps.app1.firestore();
 
 module.exports = class CertificateModel {
     constructor(title, where, url, date, status = 1, id = 0) {

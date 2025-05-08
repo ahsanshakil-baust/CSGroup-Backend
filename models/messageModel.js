@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1Dgu_qjpAIHTDLC8SdpZWu5cCbD60HjTLyUmBg9RAbmg";
 // const range = "Sheet1!A:E";
@@ -95,70 +97,71 @@
 //   }
 // };
 
-const db = require("./firebase"); // your firebase.js initialized firestore instance
+// const db = require("./firebase"); // your firebase.js initialized firestore instance
+const db = apps.app1.firestore();
 const collectionName = "messages";
 
 module.exports = class MessageModel {
-  constructor(member_id, message, url = "", status = 1, id = null) {
-    this.id = id;
-    this.member_id = member_id;
-    this.url = url;
-    this.message = message;
-    this.status = status;
-  }
-
-  async save() {
-    try {
-      let docRef;
-
-      if (this.id) {
-        docRef = db.collection(collectionName).doc(this.id.toString());
-        await docRef.set({ ...this });
-      } else {
-        docRef = await db.collection(collectionName).add({ ...this });
-        this.id = docRef.id;
-        await docRef.update({ id: this.id });
-      }
-
-      console.log("Message saved to Firebase.");
-    } catch (error) {
-      console.error("Error saving message to Firebase:", error);
+    constructor(member_id, message, url = "", status = 1, id = null) {
+        this.id = id;
+        this.member_id = member_id;
+        this.url = url;
+        this.message = message;
+        this.status = status;
     }
-  }
 
-  static async getAllMessage(callback) {
-    try {
-      const snapshot = await db.collection(collectionName).get();
-      const messages = snapshot.docs.map((doc) => doc.data());
+    async save() {
+        try {
+            let docRef;
 
-      callback(messages);
-    } catch (error) {
-      console.error("Error retrieving messages from Firebase:", error);
-      callback([]);
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            console.log("Message saved to Firebase.");
+        } catch (error) {
+            console.error("Error saving message to Firebase:", error);
+        }
     }
-  }
 
-  static async messageFindById(id, callback) {
-    try {
-      const doc = await db.collection(collectionName).doc(id).get();
-      if (!doc.exists) {
-        callback(null);
-      } else {
-        callback(doc.data());
-        console.log(doc.data());
-      }
-    } catch (error) {
-      console.error("Error finding message by ID:", error);
-      callback(null);
-    }
-  }
+    static async getAllMessage(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const messages = snapshot.docs.map((doc) => doc.data());
 
-  static async deleteById(id) {
-    try {
-      await db.collection(collectionName).doc(id.toString()).delete();
-      console.log(`Message with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting message with ID ${id}:`, error);
+            callback(messages);
+        } catch (error) {
+            console.error("Error retrieving messages from Firebase:", error);
+            callback([]);
+        }
     }
-  }
+
+    static async messageFindById(id, callback) {
+        try {
+            const doc = await db.collection(collectionName).doc(id).get();
+            if (!doc.exists) {
+                callback(null);
+            } else {
+                callback(doc.data());
+                console.log(doc.data());
+            }
+        } catch (error) {
+            console.error("Error finding message by ID:", error);
+            callback(null);
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Message with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting message with ID ${id}:`, error);
+        }
+    }
 };

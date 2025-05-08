@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1QyOOkgcEJQWwQHdV4gR8SCPizUZ4fN9OCTqot7csL2Q";
 // const range = "Sheet1!A:D";
@@ -103,7 +105,8 @@
 //   }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app2.firestore();
 const collectionName = "skills";
 
 module.exports = class SkillModel {

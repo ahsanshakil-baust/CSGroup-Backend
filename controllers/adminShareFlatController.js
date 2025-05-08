@@ -16,7 +16,7 @@ const getShareFlat = async (req, res, next) => {
         }
 
         // Fetch the project overview using async/await
-        const flat = await ShareFlatModel.shareFlatFindById(parseInt(id));
+        const flat = await ShareFlatModel.shareFlatFindById(id);
 
         // Send the response
         return res.status(200).json({ data: flat });

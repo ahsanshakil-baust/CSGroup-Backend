@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1LeyJ4rvY7Vudw6zCJIzQAeRNIrTBHlTASgMfZQck1us";
 // const range = "Sheet1!A:E";
@@ -80,54 +82,56 @@
 // };
 
 // ContactModel.js
-const db = require("./firebase");
+// const db = require("./firebase");
+
+const db = apps.app1.firestore();
 
 module.exports = class ContactModel {
-  constructor(address, phone, email, whour, map) {
-    this.address = address;
-    this.phone = phone;
-    this.email = email;
-    this.whour = whour;
-    this.map = map;
-  }
-
-  async save() {
-    const contactRef = db.collection("contacts").doc("contactInfo");
-
-    try {
-      await contactRef.set({
-        address: this.address,
-        phone: this.phone,
-        email: this.email,
-        whour: this.whour,
-        map: this.map,
-      });
-      console.log("Contact saved successfully to Firestore!");
-    } catch (err) {
-      console.error("Error saving contact to Firestore:", err);
+    constructor(address, phone, email, whour, map) {
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+        this.whour = whour;
+        this.map = map;
     }
-  }
 
-  static async getContact(callback) {
-    const contactRef = db.collection("contacts").doc("contactInfo");
+    async save() {
+        const contactRef = db.collection("contacts").doc("contactInfo");
 
-    try {
-      const doc = await contactRef.get();
-      if (doc.exists) {
-        const data = doc.data();
-        callback({
-          address: data.address || "",
-          phone: data.phone || "",
-          email: data.email || "",
-          whour: data.whour || "",
-          map: data.map || "",
-        });
-      } else {
-        callback({});
-      }
-    } catch (err) {
-      console.error("Error reading contact from Firestore:", err);
-      callback({});
+        try {
+            await contactRef.set({
+                address: this.address,
+                phone: this.phone,
+                email: this.email,
+                whour: this.whour,
+                map: this.map,
+            });
+            console.log("Contact saved successfully to Firestore!");
+        } catch (err) {
+            console.error("Error saving contact to Firestore:", err);
+        }
     }
-  }
+
+    static async getContact(callback) {
+        const contactRef = db.collection("contacts").doc("contactInfo");
+
+        try {
+            const doc = await contactRef.get();
+            if (doc.exists) {
+                const data = doc.data();
+                callback({
+                    address: data.address || "",
+                    phone: data.phone || "",
+                    email: data.email || "",
+                    whour: data.whour || "",
+                    map: data.map || "",
+                });
+            } else {
+                callback({});
+            }
+        } catch (err) {
+            console.error("Error reading contact from Firestore:", err);
+            callback({});
+        }
+    }
 };

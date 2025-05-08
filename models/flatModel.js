@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1AhGtAtMksZC5nf7JDEx-RrzOPcrauPAUz14QN0IHemY";
 // const range = "Sheet1!A:W";
@@ -197,134 +199,132 @@
 // };
 
 // FlatModel.js
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app3.firestore(); // Ensure `apps.app2` is properly initialized
+
+const collectionName = "flats";
 
 module.exports = class FlatModel {
-  constructor(
-    type,
-    flat_number,
-    floor,
-    address,
-    direction,
-    bedrooms,
-    drawing,
-    dining,
-    bathrooms,
-    balconies,
-    kitchen,
-    flat_images,
-    feature_images,
-    flat_videos,
-    completion_status,
-    project_id,
-    available,
-    city,
-    room_type,
-    description,
-    serial_no,
-    status = 1,
-    id = 0
-  ) {
-    this.id = id;
-    this.type = type;
-    this.flat_number = flat_number;
-    this.floor = floor;
-    this.address = address;
-    this.direction = direction;
-    this.bedrooms = bedrooms;
-    this.drawing = drawing;
-    this.dining = dining;
-    this.bathrooms = bathrooms;
-    this.balconies = balconies;
-    this.kitchen = kitchen;
-    this.flat_images = flat_images;
-    this.feature_images = feature_images;
-    this.flat_videos = flat_videos;
-    this.completion_status = completion_status;
-    this.project_id = project_id;
-    this.available = available;
-    this.city = city;
-    this.room_type = room_type;
-    this.description = description;
-    this.serial_no = serial_no;
-    this.status = status;
-  }
-
-  async save(callback) {
-    const flatRef = db.collection("flats").doc(String(this.id));
-
-    try {
-      await flatRef.set({
-        type: this.type,
-        flat_number: this.flat_number,
-        floor: this.floor,
-        address: this.address,
-        direction: this.direction,
-        bedrooms: this.bedrooms,
-        drawing: this.drawing,
-        dining: this.dining,
-        bathrooms: this.bathrooms,
-        balconies: this.balconies,
-        kitchen: this.kitchen,
-        flat_images: this.flat_images,
-        feature_images: this.feature_images,
-        flat_videos: this.flat_videos,
-        completion_status: this.completion_status,
-        project_id: this.project_id,
-        available: this.available,
-        city: this.city,
-        room_type: this.room_type,
-        description: this.description,
-        serial_no: this.serial_no,
-        status: this.status,
-      });
-      console.log("Flat details saved successfully to Firestore!");
-      callback({ id: this.id });
-    } catch (err) {
-      console.error("Error saving flat details to Firestore:", err);
+    constructor(
+        type,
+        flat_number,
+        floor,
+        address,
+        direction,
+        bedrooms,
+        drawing,
+        dining,
+        bathrooms,
+        balconies,
+        kitchen,
+        flat_images,
+        feature_images,
+        flat_videos,
+        completion_status,
+        project_id,
+        available,
+        city,
+        room_type,
+        description,
+        serial_no,
+        status = 1,
+        id = null
+    ) {
+        this.id = id;
+        this.type = type;
+        this.flat_number = flat_number;
+        this.floor = floor;
+        this.address = address;
+        this.direction = direction;
+        this.bedrooms = bedrooms;
+        this.drawing = drawing;
+        this.dining = dining;
+        this.bathrooms = bathrooms;
+        this.balconies = balconies;
+        this.kitchen = kitchen;
+        this.flat_images = flat_images;
+        this.feature_images = feature_images;
+        this.flat_videos = flat_videos;
+        this.completion_status = completion_status;
+        this.project_id = project_id;
+        this.available = available;
+        this.city = city;
+        this.room_type = room_type;
+        this.description = description;
+        this.serial_no = serial_no;
+        this.status = status;
     }
-  }
 
-  static async getAllFlat(callback) {
-    const flatRef = db.collection("flats");
+    async save(callback) {
+        try {
+            let docRef;
 
-    try {
-      const snapshot = await flatRef.get();
-      const flats = snapshot.docs.map((doc) => doc.data());
-      callback(flats);
-    } catch (err) {
-      console.error("Error reading flat details from Firestore:", err);
-      callback([]);
+            if (this.id) {
+                docRef = db.collection(collectionName).doc(this.id.toString());
+                await docRef.set({ ...this });
+            } else {
+                docRef = await db.collection(collectionName).add({ ...this });
+                this.id = docRef.id;
+                await docRef.update({ id: this.id });
+            }
+
+            if (callback) callback(this.id);
+            console.log("Flat saved successfully to Firebase.");
+        } catch (error) {
+            console.error("Error saving flat:", error);
+        }
     }
-  }
 
-  static async flatFindById(id) {
-    try {
-      const flatData = await FlatModel.getAllFlat((data) => data);
-      const flat = flatData.find((flat) => flat.id === id);
-      return flat || null;
-    } catch (err) {
-      console.error("Error finding flat by id:", err);
-      return null;
+    static async getAllFlat(callback) {
+        try {
+            const snapshot = await db.collection(collectionName).get();
+            const data = snapshot.docs.map((doc) => doc.data());
+            callback(data);
+        } catch (error) {
+            console.error("Error fetching flats:", error);
+            callback([]);
+        }
     }
-  }
 
-  static async flatIdByProjectFloor(id, floor) {
-    try {
-      const flats = await FlatModel.getAllFlat((data) => data);
-      const filteredFlats = flats.filter(
-        (flat) => flat.project_id == id && flat.floor == floor
-      );
-
-      const sortedFlats = filteredFlats.sort(
-        (a, b) => a.serial_no - b.serial_no
-      );
-
-      console.log(sortedFlats);
-      return sortedFlats;
-    } catch (err) {
-      console.error("Error filtering flats by project and floor:", err);
-      return [];
+    static async flatFindById(id) {
+        try {
+            const doc = await db
+                .collection(collectionName)
+                .doc(id.toString())
+                .get();
+            if (!doc.exists) throw new Error("No Flat found");
+            return doc.data();
+        } catch (error) {
+            console.error("Error finding flat:", error);
+            return null;
+        }
     }
-  }
+
+    static async flatIdByProjectFloor(project_id, floor) {
+        try {
+            const snapshot = await db
+                .collection(collectionName)
+                .where("project_id", "==", project_id)
+                .where("floor", "==", floor)
+                .get();
+
+            const data = snapshot.docs
+                .map((doc) => doc.data())
+                .sort((a, b) => a.serial_no - b.serial_no);
+
+            return data;
+        } catch (error) {
+            console.error("Error filtering flats by project and floor:", error);
+            return [];
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection(collectionName).doc(id.toString()).delete();
+            console.log(`Flat with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting flat with ID ${id}:`, error);
+        }
+    }
 };

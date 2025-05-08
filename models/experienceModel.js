@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1y7GrWn2Eb5JFzkz_uZ4Xv0zN5_2k2ZK0-2-r4BaJpo4";
 // const range = "Sheet1!A:G";
@@ -135,7 +137,8 @@
 // };
 
 // ExperienceModel.js
-const db = require("./firebase");
+// const db = require("./firebase2");
+const db = apps.app2.firestore();
 const collectionName = "experiences";
 
 module.exports = class ExperienceModel {

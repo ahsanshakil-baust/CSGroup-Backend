@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "12dUZQa2cONzfUuKJXvFRJjQWx3RUU3mr441bPvwkol4";
 // const range = "Sheet1!A1";
@@ -60,38 +62,38 @@
 //   }
 // };
 
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 
 module.exports = class HomeSlidersText {
-  constructor(text) {
-    this.text = text;
-  }
-
-  async save(callback) {
-    try {
-      const textRef = db.collection("home_slider_text").doc("text");
-      await textRef.set({
-        text: this.text,
-      });
-      console.log("Text saved successfully to Firestore!");
-      callback({ text: this.text });
-    } catch (err) {
-      console.error("Error saving text to Firestore:", err);
+    constructor(text) {
+        this.text = text;
     }
-  }
 
-  static async getText(callback) {
-    try {
-      const textRef = db.collection("home_slider_text").doc("text");
-      const doc = await textRef.get();
-      if (doc.exists) {
-        callback({ text: doc.data().text });
-      } else {
-        callback({ text: "" });
-      }
-    } catch (err) {
-      console.error("Error reading from Firestore:", err);
-      callback({ text: "" });
+    async save() {
+        try {
+            const textRef = db.collection("home_slider_text").doc("text");
+            await textRef.set({
+                text: this.text,
+            });
+            console.log("Text saved successfully to Firestore!");
+        } catch (err) {
+            console.error("Error saving text to Firestore:", err);
+        }
     }
-  }
+
+    static async getText(callback) {
+        try {
+            const textRef = db.collection("home_slider_text").doc("text");
+            const doc = await textRef.get();
+            if (doc.exists) {
+                callback({ text: doc.data().text });
+            } else {
+                callback({ text: "" });
+            }
+        } catch (err) {
+            console.error("Error reading from Firestore:", err);
+            callback({ text: "" });
+        }
+    }
 };

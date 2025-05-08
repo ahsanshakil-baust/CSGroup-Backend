@@ -1,5 +1,7 @@
 // const { google } = require("googleapis");
 
+const apps = require("./firebase");
+
 // const credentials = require("./credentials.json");
 // const sheetId = "1X17gi-gH0xEgYmiwE5MERbIr3KBgJq44UOW7UuS8pwk";
 // const range = "Sheet1!A:J";
@@ -132,124 +134,128 @@
 // };
 
 // TeamMemberModel.js
-const db = require("./firebase");
+// const db = require("./firebase");
+const db = apps.app1.firestore();
 
 module.exports = class TeamMemberModel {
-  constructor(
-    name,
-    url,
-    designation,
-    info,
-    fb = "",
-    likdn = "",
-    twt = "",
-    type,
-    status = 1,
-    id = 0
-  ) {
-    this.id = id;
-    this.name = name;
-    this.url = url;
-    this.designation = designation;
-    this.info = info;
-    this.fb = fb;
-    this.likdn = likdn;
-    this.twt = twt;
-    this.type = type;
-    this.status = status;
-  }
-
-  async save() {
-    const membersRef = db.collection("teamMembers");
-
-    if (this.id > 0) {
-      // Update existing document
-      await membersRef.doc(this.id.toString()).set({
-        id: this.id,
-        name: this.name,
-        url: this.url,
-        designation: this.designation,
-        info: this.info,
-        fb: this.fb,
-        likdn: this.likdn,
-        twt: this.twt,
-        type: this.type,
-        status: this.status,
-      });
-      console.log("Team Member updated in Firestore!");
-    } else {
-      // Add new document
-      const snapshot = await membersRef.get();
-      this.id = snapshot.size + 1;
-
-      await membersRef.doc(this.id.toString()).set({
-        id: this.id,
-        name: this.name,
-        url: this.url,
-        designation: this.designation,
-        info: this.info,
-        fb: this.fb,
-        likdn: this.likdn,
-        twt: this.twt,
-        type: this.type,
-        status: this.status,
-      });
-      console.log("Team Member added to Firestore!");
+    constructor(
+        name,
+        url,
+        designation,
+        info,
+        fb = "",
+        likdn = "",
+        twt = "",
+        type,
+        status = 1,
+        id = 0
+    ) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+        this.designation = designation;
+        this.info = info;
+        this.fb = fb;
+        this.likdn = likdn;
+        this.twt = twt;
+        this.type = type;
+        this.status = status;
     }
-  }
 
-  static async getAllTeamMember(callback) {
-    try {
-      const snapshot = await db.collection("teamMembers").get();
-      const members = [];
-      snapshot.forEach((doc) => {
-        members.push(doc.data());
-      });
-      callback(members);
-    } catch (err) {
-      console.error("Error fetching team members:", err);
-      callback([]);
+    async save() {
+        const membersRef = db.collection("teamMembers");
+
+        if (this.id > 0) {
+            // Update existing document
+            await membersRef.doc(this.id.toString()).set({
+                id: this.id,
+                name: this.name,
+                url: this.url,
+                designation: this.designation,
+                info: this.info,
+                fb: this.fb,
+                likdn: this.likdn,
+                twt: this.twt,
+                type: this.type,
+                status: this.status,
+            });
+            console.log("Team Member updated in Firestore!");
+        } else {
+            // Add new document
+            const snapshot = await membersRef.get();
+            this.id = snapshot.size + 1;
+
+            await membersRef.doc(this.id.toString()).set({
+                id: this.id,
+                name: this.name,
+                url: this.url,
+                designation: this.designation,
+                info: this.info,
+                fb: this.fb,
+                likdn: this.likdn,
+                twt: this.twt,
+                type: this.type,
+                status: this.status,
+            });
+            console.log("Team Member added to Firestore!");
+        }
     }
-  }
 
-  static async teamMemberFindById(id, callback) {
-    try {
-      const doc = await db.collection("teamMembers").doc(id.toString()).get();
-
-      if (doc.exists) {
-        callback(doc.data());
-
-        console.log(doc.data());
-      } else {
-        callback(null);
-      }
-    } catch (err) {
-      console.error("Error finding team member by ID:", err);
-      callback(null);
+    static async getAllTeamMember(callback) {
+        try {
+            const snapshot = await db.collection("teamMembers").get();
+            const members = [];
+            snapshot.forEach((doc) => {
+                members.push(doc.data());
+            });
+            callback(members);
+        } catch (err) {
+            console.error("Error fetching team members:", err);
+            callback([]);
+        }
     }
-  }
 
-  static async teamMemberById(member_id) {
-    try {
-      const doc = await db
-        .collection("teamMembers")
-        .doc(member_id.toString())
-        .get();
-      if (!doc.exists) {
-        throw new Error("No team details found");
-      }
-      return doc.data();
-    } catch (err) {
-      throw err;
-    }
-  }
+    static async teamMemberFindById(id, callback) {
+        try {
+            const doc = await db
+                .collection("teamMembers")
+                .doc(id.toString())
+                .get();
 
-  static async deleteById(id) {
-    try {
-      await db.collection("teamMembers").doc(id.toString()).delete();
-      console.log(`Team with ID ${id} deleted successfully.`);
-    } catch (error) {
-      console.error(`Error deleting Team with ID ${id}:`, error);
+            if (doc.exists) {
+                callback(doc.data());
+
+                console.log(doc.data());
+            } else {
+                callback(null);
+            }
+        } catch (err) {
+            console.error("Error finding team member by ID:", err);
+            callback(null);
+        }
     }
-  }
+
+    static async teamMemberById(member_id) {
+        try {
+            const doc = await db
+                .collection("teamMembers")
+                .doc(member_id.toString())
+                .get();
+            if (!doc.exists) {
+                throw new Error("No team details found");
+            }
+            return doc.data();
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    static async deleteById(id) {
+        try {
+            await db.collection("teamMembers").doc(id.toString()).delete();
+            console.log(`Team with ID ${id} deleted successfully.`);
+        } catch (error) {
+            console.error(`Error deleting Team with ID ${id}:`, error);
+        }
+    }
 };

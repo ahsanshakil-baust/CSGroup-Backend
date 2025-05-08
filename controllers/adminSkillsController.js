@@ -37,8 +37,6 @@ const getAllSkill = (req, res, next) => {
     SkillModel.getAllSkills((data) => {
         const newData = data.filter((el) => el.status != 0);
 
-        console.log(newData);
-
         res.status(200).json({
             data: newData,
         });
@@ -55,7 +53,6 @@ const getSkill = async (req, res, next) => {
         });
     } else {
         const data = await SkillModel.skillFindByPortfolioId(convertedId);
-        console.log(data);
 
         const filterData = data.filter((el) => el.status != 0);
 

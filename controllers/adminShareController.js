@@ -27,7 +27,7 @@ const getAllShares = async (req, res, next) => {
 
 const getShare = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             return res.status(400).json({ error: "Need To Pass Id." });
