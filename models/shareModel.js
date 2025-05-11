@@ -146,79 +146,88 @@ const db = apps.app4.firestore();
 const collectionName = "shares";
 
 module.exports = class ShareModel {
-    constructor(
-        name,
-        location,
-        description,
-        share_videos,
-        project_images,
-        map_url,
-        project_structure,
-        city,
-        available,
-        id = null,
-        status = 1
-    ) {
-        this.id = id;
-        this.name = name;
-        this.location = location;
-        this.description = description;
-        this.share_videos = share_videos;
-        this.project_images = project_images;
-        this.map_url = map_url;
-        this.project_structure = project_structure;
-        this.city = city;
-        this.available = available;
-        this.status = status;
+  constructor(
+    name,
+    location,
+    description,
+    share_videos = [],
+    project_images = [],
+    map_url,
+    project_structure,
+    city,
+    available,
+    id = null,
+    status = 1
+  ) {
+    this.id = id;
+    this.name = name;
+    this.location = location;
+    this.description = description;
+    this.share_videos = share_videos;
+    this.project_images = project_images;
+    this.map_url = map_url;
+    this.project_structure = project_structure;
+    this.city = city;
+    this.available = available;
+    this.status = status;
+  }
+
+  async save(callback) {
+    try {
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      if (callback) callback(this.id);
+      console.log("Share saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving share to Firebase:", error);
     }
+  }
 
-    async save(callback) {
-        try {
-            let docRef;
+  static async getAllShares(callback) {
+    try {
+      const snapshot = await db.collection(collectionName).get();
+      const shares = snapshot.docs.map((doc) => doc.data());
+      callback(shares);
+    } catch (error) {
+      console.error("Error getting shares from Firebase:", error);
+      callback([]);
+    }
+  }
 
-            if (this.id) {
-                docRef = db.collection(collectionName).doc(this.id.toString());
-                await docRef.set({ ...this });
-            } else {
-                docRef = await db.collection(collectionName).add({ ...this });
-                this.id = docRef.id;
-                await docRef.update({ id: this.id });
-            }
-
-            if (callback) callback(this.id);
-            console.log("Share saved to Firebase.");
-        } catch (error) {
-            console.error("Error saving share to Firebase:", error);
+  static async shareFindById(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const doc = await db
+          .collection(collectionName)
+          .doc(id.toString())
+          .get();
+        if (!doc.exists) {
+          resolve(null);
+        } else {
+          resolve(doc.data());
         }
-    }
+      } catch (error) {
+        console.error("Error finding share by ID:", error);
+        reject(error);
+      }
+    });
+  }
 
-    static async getAllShares(callback) {
-        try {
-            const snapshot = await db.collection(collectionName).get();
-            const shares = snapshot.docs.map((doc) => doc.data());
-            callback(shares);
-        } catch (error) {
-            console.error("Error getting shares from Firebase:", error);
-            callback([]);
-        }
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Share with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting Share with ID ${id}:`, error);
     }
-
-    static async shareFindById(id) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const doc = await db
-                    .collection(collectionName)
-                    .doc(id.toString())
-                    .get();
-                if (!doc.exists) {
-                    resolve(null);
-                } else {
-                    resolve(doc.data());
-                }
-            } catch (error) {
-                console.error("Error finding share by ID:", error);
-                reject(error);
-            }
-        });
-    }
+  }
 };

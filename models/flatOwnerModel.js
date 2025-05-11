@@ -146,83 +146,114 @@ const db = apps.app3.firestore();
 const collectionName = "owners";
 
 module.exports = class OwnerModel {
-    constructor(
-        name,
-        image,
-        occupation,
-        blood_group,
-        p_address,
-        mobile,
-        flat_id,
-        id = null,
-        status = 1
-    ) {
-        this.id = id;
-        this.name = name;
-        this.image = image;
-        this.occupation = occupation;
-        this.blood_group = blood_group;
-        this.p_address = p_address;
-        this.mobile = mobile;
-        this.flat_id = flat_id;
-        this.status = status;
+  constructor(
+    name = "",
+    image = "",
+    occupation = "",
+    blood_group = "",
+    p_address = "",
+    mobile = "",
+    flat_id,
+    id = null,
+    status = 1
+  ) {
+    this.id = id;
+    this.name = name;
+    this.image = image;
+    this.occupation = occupation;
+    this.blood_group = blood_group;
+    this.p_address = p_address;
+    this.mobile = mobile;
+    this.flat_id = flat_id;
+    this.status = status;
+  }
+
+  async save(callback) {
+    try {
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      if (callback) callback(this.id);
+
+      console.log("Owner saved successfully to Firebase.");
+    } catch (error) {
+      console.error("Error saving owner:", error);
     }
+  }
 
-    async save(callback) {
-        try {
-            let docRef;
-
-            if (this.id) {
-                docRef = db.collection(collectionName).doc(this.id.toString());
-                await docRef.set({ ...this });
-            } else {
-                docRef = await db.collection(collectionName).add({ ...this });
-                this.id = docRef.id;
-                await docRef.update({ id: this.id });
-            }
-
-            if (callback) callback(this.id);
-
-            console.log("Owner saved successfully to Firebase.");
-        } catch (error) {
-            console.error("Error saving owner:", error);
-        }
+  static async getAllOwners(callback) {
+    try {
+      const snapshot = await db.collection(collectionName).get();
+      const data = snapshot.docs.map((doc) => doc.data());
+      callback(data);
+    } catch (error) {
+      console.error("Error fetching owners:", error);
+      callback([]);
     }
+  }
 
-    static async getAllOwners(callback) {
-        try {
-            const snapshot = await db.collection(collectionName).get();
-            const data = snapshot.docs.map((doc) => doc.data());
-            callback(data);
-        } catch (error) {
-            console.error("Error fetching owners:", error);
-            callback([]);
-        }
+  static async ownerFindById(flat_id) {
+    try {
+      const snapshot = await db
+        .collection(collectionName)
+        .where("flat_id", "==", flat_id)
+        .limit(1)
+        .get();
+
+      if (snapshot.empty) return null;
+
+      return snapshot.docs[0].data();
+    } catch (error) {
+      console.error("Error finding owner by flat_id:", error);
+      return null;
     }
+  }
 
-    static async ownerFindById(flat_id) {
-        try {
-            const snapshot = await db
-                .collection(collectionName)
-                .where("flat_id", "==", flat_id)
-                .limit(1)
-                .get();
-
-            if (snapshot.empty) return null;
-
-            return snapshot.docs[0].data();
-        } catch (error) {
-            console.error("Error finding owner by flat_id:", error);
-            return null;
-        }
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Owner with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting owner with ID ${id}:`, error);
     }
+  }
 
-    static async deleteById(id) {
-        try {
-            await db.collection(collectionName).doc(id.toString()).delete();
-            console.log(`Owner with ID ${id} deleted successfully.`);
-        } catch (error) {
-            console.error(`Error deleting owner with ID ${id}:`, error);
-        }
+  static async deleteByFlatId(flat_id) {
+    try {
+      const snapshot = await db
+        .collection(collectionName)
+        .where("flat_id", "==", flat_id)
+        .get();
+
+      if (snapshot.empty) {
+        console.log(
+          `No Flat Owner Details entries found for flat_id: ${flat_id}`
+        );
+        return;
+      }
+
+      const batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(
+        `All Flat Owner Details entries for flat_id ${flat_id} deleted successfully.`
+      );
+    } catch (error) {
+      console.error(
+        `Error deleting Flat Owner Details entries for flat_id ${flat_id}:`,
+        error
+      );
     }
+  }
 };

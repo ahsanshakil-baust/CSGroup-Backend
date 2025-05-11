@@ -155,107 +155,135 @@ const db = apps.app3.firestore();
 const collectionName = "flat_land_details";
 
 module.exports = class FlatLandDetailsModel {
-    constructor(
-        area,
-        building_height,
-        total_share,
-        total_sqf,
-        net_sqf,
-        price,
-        reg_cost,
-        khariz_cost,
-        other_cost,
-        total_price,
-        flat_id,
-        id = null,
-        status = 1
-    ) {
-        this.id = id;
-        this.area = area;
-        this.building_height = building_height;
-        this.total_share = total_share;
-        this.total_sqf = total_sqf;
-        this.net_sqf = net_sqf;
-        this.price = price;
-        this.reg_cost = reg_cost;
-        this.khariz_cost = khariz_cost;
-        this.other_cost = other_cost;
-        this.total_price = total_price;
-        this.flat_id = flat_id;
-        this.status = status;
+  constructor(
+    area,
+    building_height,
+    total_share,
+    total_sqf,
+    net_sqf,
+    price,
+    reg_cost,
+    khariz_cost,
+    other_cost,
+    total_price,
+    flat_id,
+    id = null,
+    status = 1
+  ) {
+    this.id = id;
+    this.area = area;
+    this.building_height = building_height;
+    this.total_share = total_share;
+    this.total_sqf = total_sqf;
+    this.net_sqf = net_sqf;
+    this.price = price;
+    this.reg_cost = reg_cost;
+    this.khariz_cost = khariz_cost;
+    this.other_cost = other_cost;
+    this.total_price = total_price;
+    this.flat_id = flat_id;
+    this.status = status;
+  }
+
+  async save(callback) {
+    try {
+      const data = {
+        area: this.area,
+        building_height: this.building_height,
+        total_share: this.total_share,
+        total_sqf: this.total_sqf,
+        net_sqf: this.net_sqf,
+        price: this.price,
+        reg_cost: this.reg_cost,
+        khariz_cost: this.khariz_cost,
+        other_cost: this.other_cost,
+        total_price: this.total_price,
+        flat_id: this.flat_id,
+        status: this.status,
+      };
+
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...data, id: this.id });
+      } else {
+        docRef = await db.collection(collectionName).add(data);
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      if (callback) callback(this.id);
+      console.log("Flat land detail saved successfully to Firebase.");
+    } catch (error) {
+      console.error("Error saving flat land detail:", error);
     }
+  }
 
-    async save(callback) {
-        try {
-            const data = {
-                area: this.area,
-                building_height: this.building_height,
-                total_share: this.total_share,
-                total_sqf: this.total_sqf,
-                net_sqf: this.net_sqf,
-                price: this.price,
-                reg_cost: this.reg_cost,
-                khariz_cost: this.khariz_cost,
-                other_cost: this.other_cost,
-                total_price: this.total_price,
-                flat_id: this.flat_id,
-                status: this.status,
-            };
-
-            let docRef;
-
-            if (this.id) {
-                docRef = db.collection(collectionName).doc(this.id.toString());
-                await docRef.set({ ...data, id: this.id });
-            } else {
-                docRef = await db.collection(collectionName).add(data);
-                this.id = docRef.id;
-                await docRef.update({ id: this.id });
-            }
-
-            if (callback) callback(this.id);
-            console.log("Flat land detail saved successfully to Firebase.");
-        } catch (error) {
-            console.error("Error saving flat land detail:", error);
-        }
+  static async getAllLandDetails(callback) {
+    try {
+      const snapshot = await db.collection(collectionName).get();
+      const data = snapshot.docs.map((doc) => doc.data());
+      callback(data);
+    } catch (error) {
+      console.error("Error fetching land details:", error);
+      callback([]);
     }
+  }
 
-    static async getAllLandDetails(callback) {
-        try {
-            const snapshot = await db.collection(collectionName).get();
-            const data = snapshot.docs.map((doc) => doc.data());
-            callback(data);
-        } catch (error) {
-            console.error("Error fetching land details:", error);
-            callback([]);
-        }
+  static async landFindById(flat_id) {
+    try {
+      const snapshot = await db
+        .collection(collectionName)
+        .where("flat_id", "==", flat_id)
+        .get();
+
+      if (snapshot.empty) return null;
+
+      return snapshot.docs[0].data();
+    } catch (error) {
+      console.error("Error finding land detail:", error);
+      return null;
     }
+  }
 
-    static async landFindById(flat_id) {
-        try {
-            const snapshot = await db
-                .collection(collectionName)
-                .where("flat_id", "==", flat_id)
-                .get();
-
-            if (snapshot.empty) return null;
-
-            return snapshot.docs[0].data();
-        } catch (error) {
-            console.error("Error finding land detail:", error);
-            return null;
-        }
+  static async deleteById(id) {
+    try {
+      await db.collection(collectionName).doc(id.toString()).delete();
+      console.log(`Flat land detail with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting flat land detail with ID ${id}:`, error);
     }
+  }
 
-    static async deleteById(id) {
-        try {
-            await db.collection(collectionName).doc(id.toString()).delete();
-            console.log(`Flat land detail with ID ${id} deleted successfully.`);
-        } catch (error) {
-            console.error(
-                `Error deleting flat land detail with ID ${id}:`,
-                error
-            );
-        }
+  static async deleteByFlatId(flat_id) {
+    try {
+      const snapshot = await db
+        .collection(collectionName)
+        .where("flat_id", "==", flat_id)
+        .get();
+
+      if (snapshot.empty) {
+        console.log(
+          `No Flat Land Details entries found for flat_id: ${flat_id}`
+        );
+        return;
+      }
+
+      const batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(
+        `All Flat Land Details entries for flat_id ${flat_id} deleted successfully.`
+      );
+    } catch (error) {
+      console.error(
+        `Error deleting Flat Land Details entries for flat_id ${flat_id}:`,
+        error
+      );
     }
+  }
 };

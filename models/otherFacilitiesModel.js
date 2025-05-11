@@ -126,81 +126,81 @@ const apps = require("./firebase");
 const db = apps.app1.firestore();
 
 module.exports = class OthersFacilitiesModel {
-    constructor(
-        lift,
-        stair,
-        generator,
-        cctv,
-        security_guard,
-        others_facilities,
-        project_id,
-        status = 1,
-        id = 0
-    ) {
-        this.id = id;
-        this.lift = lift;
-        this.stair = stair;
-        this.generator = generator;
-        this.cctv = cctv;
-        this.security_guard = security_guard;
-        this.others_facilities = others_facilities;
-        this.project_id = project_id;
-        this.status = status;
+  constructor(
+    lift,
+    stair,
+    generator,
+    cctv,
+    security_guard,
+    others_facilities = [],
+    project_id,
+    status = 1,
+    id = 0
+  ) {
+    this.id = id;
+    this.lift = lift;
+    this.stair = stair;
+    this.generator = generator;
+    this.cctv = cctv;
+    this.security_guard = security_guard;
+    this.others_facilities = others_facilities;
+    this.project_id = project_id;
+    this.status = status;
+  }
+
+  async save(callback) {
+    try {
+      const facilitiesRef = db
+        .collection("other_facilities")
+        .doc(String(this.project_id));
+
+      if (this.id === 0) {
+        this.id = Date.now(); // Use timestamp for unique ID if not provided
+      }
+
+      await facilitiesRef.set({
+        lift: this.lift,
+        stair: this.stair,
+        generator: this.generator,
+        cctv: this.cctv,
+        security_guard: this.security_guard,
+        others_facilities: this.others_facilities,
+        project_id: this.project_id,
+        status: this.status,
+      });
+
+      console.log("Data saved successfully to Firestore!");
+      callback({ id: this.id });
+    } catch (err) {
+      console.error("Error saving data to Firestore:", err);
     }
+  }
 
-    async save(callback) {
-        try {
-            const facilitiesRef = db
-                .collection("other_facilities")
-                .doc(String(this.project_id));
-
-            if (this.id === 0) {
-                this.id = Date.now(); // Use timestamp for unique ID if not provided
-            }
-
-            await facilitiesRef.set({
-                lift: this.lift,
-                stair: this.stair,
-                generator: this.generator,
-                cctv: this.cctv,
-                security_guard: this.security_guard,
-                others_facilities: this.others_facilities,
-                project_id: this.project_id,
-                status: this.status,
-            });
-
-            console.log("Data saved successfully to Firestore!");
-            callback({ id: this.id });
-        } catch (err) {
-            console.error("Error saving data to Firestore:", err);
-        }
+  static async getAllFacilities(callback) {
+    try {
+      const snapshot = await db.collection("other_facilities").get();
+      const facilities = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(facilities);
+    } catch (err) {
+      console.error("Error reading from Firestore:", err);
+      callback([]);
     }
+  }
 
-    static async getAllFacilities(callback) {
-        try {
-            const snapshot = await db.collection("other_facilities").get();
-            const facilities = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            callback(facilities);
-        } catch (err) {
-            console.error("Error reading from Firestore:", err);
-            callback([]);
-        }
+  static async facilitiesFindById(id, callback) {
+    try {
+      const doc = await db.collection("other_facilities").doc(id).get();
+      if (doc.exists) {
+        callback(doc.data());
+      } else {
+        callback(null);
+      }
+    } catch (err) {
+      console.error("Error fetching data from Firestore:", err);
+      callback(null);
     }
-
-    static async facilitiesFindById(id, callback) {
-        try {
-            const doc = await db.collection("other_facilities").doc(id).get();
-            if (doc.exists) {
-                callback(doc.data());
-            } else {
-                callback(null);
-            }
-        } catch (err) {
-            console.error("Error fetching data from Firestore:", err);
-            callback(null);
-        }
-    }
+  }
 };

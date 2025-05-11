@@ -77,7 +77,7 @@ const getTeamMember = (req, res, next) => {
   }
 };
 
-const deleteTeamMember = (req, res, next) => {
+const deleteTeamMember = async (req, res, next) => {
   const { id } = req.body;
   if (!id) {
     res.status(500).json({
@@ -88,7 +88,7 @@ const deleteTeamMember = (req, res, next) => {
     // info.id = id;
     // info.status = 0;
     // info.save();
-    TeamMemberModel.deleteById(id);
+    await TeamMemberModel.deleteById(id);
     res.status(201).json({
       msg: "Team Member deleted successfully!",
     });

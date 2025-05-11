@@ -148,86 +148,117 @@ const db = apps.app4.firestore();
 const collectionName = "share_flats";
 
 module.exports = class ShareFlatModel {
-    constructor(
-        bedrooms,
-        bathrooms,
-        balconies,
-        drawing,
-        dining,
-        kitchen,
-        lift,
-        stair,
-        cctv,
-        generator,
-        share_id,
-        status = 1,
-        id = null
-    ) {
-        this.id = id;
-        this.bedrooms = bedrooms;
-        this.bathrooms = bathrooms;
-        this.balconies = balconies;
-        this.drawing = drawing;
-        this.dining = dining;
-        this.kitchen = kitchen;
-        this.lift = lift;
-        this.stair = stair;
-        this.cctv = cctv;
-        this.generator = generator;
-        this.share_id = share_id;
-        this.status = status;
+  constructor(
+    bedrooms,
+    bathrooms,
+    balconies,
+    drawing,
+    dining,
+    kitchen,
+    lift,
+    stair,
+    cctv,
+    generator,
+    share_id,
+    status = 1,
+    id = null
+  ) {
+    this.id = id;
+    this.bedrooms = bedrooms;
+    this.bathrooms = bathrooms;
+    this.balconies = balconies;
+    this.drawing = drawing;
+    this.dining = dining;
+    this.kitchen = kitchen;
+    this.lift = lift;
+    this.stair = stair;
+    this.cctv = cctv;
+    this.generator = generator;
+    this.share_id = share_id;
+    this.status = status;
+  }
+
+  async save(callback) {
+    try {
+      let docRef;
+
+      if (this.id) {
+        docRef = db.collection(collectionName).doc(this.id.toString());
+        await docRef.set({ ...this });
+      } else {
+        docRef = await db.collection(collectionName).add({ ...this });
+        this.id = docRef.id;
+        await docRef.update({ id: this.id });
+      }
+
+      if (callback) callback({ id: this.id });
+
+      console.log("Share flat saved to Firebase.");
+    } catch (error) {
+      console.error("Error saving share flat to Firebase:", error);
     }
+  }
 
-    async save(callback) {
-        try {
-            let docRef;
+  static async getAllShareFlat(callback) {
+    try {
+      const snapshot = await db.collection(collectionName).get();
+      const flats = snapshot.docs.map((doc) => doc.data());
+      callback(flats);
+    } catch (error) {
+      console.error("Error fetching share flats from Firebase:", error);
+      callback([]);
+    }
+  }
 
-            if (this.id) {
-                docRef = db.collection(collectionName).doc(this.id.toString());
-                await docRef.set({ ...this });
-            } else {
-                docRef = await db.collection(collectionName).add({ ...this });
-                this.id = docRef.id;
-                await docRef.update({ id: this.id });
-            }
+  static async shareFlatFindById(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const snapshot = await db
+          .collection(collectionName)
+          .where("share_id", "==", id.toString())
+          .get();
 
-            if (callback) callback({ id: this.id });
-
-            console.log("Share flat saved to Firebase.");
-        } catch (error) {
-            console.error("Error saving share flat to Firebase:", error);
+        if (snapshot.empty) {
+          return resolve(null);
         }
+
+        const result = snapshot.docs[0].data();
+        resolve(result);
+      } catch (error) {
+        console.error("Error finding share flat by share_id:", error);
+        reject(error);
+      }
+    });
+  }
+
+  static async deleteByShareId(share_id) {
+    try {
+      const snapshot = await db
+        .collection(collectionName)
+        .where("share_id", "==", share_id)
+        .get();
+
+      if (snapshot.empty) {
+        console.log(
+          `No Share Flat Details entries found for share_id: ${share_id}`
+        );
+        return;
+      }
+
+      const batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      console.log(
+        `All Share Flat Details entries for share_id ${share_id} deleted successfully.`
+      );
+    } catch (error) {
+      console.error(
+        `Error deleting Share Flat Details entries for share_id ${share_id}:`,
+        error
+      );
     }
-
-    static async getAllShareFlat(callback) {
-        try {
-            const snapshot = await db.collection(collectionName).get();
-            const flats = snapshot.docs.map((doc) => doc.data());
-            callback(flats);
-        } catch (error) {
-            console.error("Error fetching share flats from Firebase:", error);
-            callback([]);
-        }
-    }
-
-    static async shareFlatFindById(id) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const snapshot = await db
-                    .collection(collectionName)
-                    .where("share_id", "==", id.toString())
-                    .get();
-
-                if (snapshot.empty) {
-                    return resolve(null);
-                }
-
-                const result = snapshot.docs[0].data();
-                resolve(result);
-            } catch (error) {
-                console.error("Error finding share flat by share_id:", error);
-                reject(error);
-            }
-        });
-    }
+  }
 };
