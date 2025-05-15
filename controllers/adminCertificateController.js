@@ -45,7 +45,7 @@ const getAllCertificate = (req, res, next) => {
 
 const getCertificate = (req, res, next) => {
     const { id } = req.params;
-    const convertedId = Number(id);
+    const convertedId = id;
 
     if (!id) {
         res.status(500).json({
@@ -58,17 +58,18 @@ const getCertificate = (req, res, next) => {
     }
 };
 
-const deleteCertificate = (req, res, next) => {
+const deleteCertificate = async (req, res, next) => {
     const { id } = req.body;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        const certificate = new CertificateModel();
-        certificate.id = id;
-        certificate.status = 0;
-        certificate.save();
+        // const certificate = new CertificateModel();
+        // certificate.id = id;
+        // certificate.status = 0;
+        // certificate.save();
+        await CertificateModel.deleteById(id);
         res.status(201).json({
             msg: "Certificate deleted successfully!",
         });

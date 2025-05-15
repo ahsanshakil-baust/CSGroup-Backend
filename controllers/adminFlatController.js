@@ -120,7 +120,7 @@ const getAllFlatsByProject = async (req, res, next) => {
 
 const getFlatDetails = async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     if (Number.isNaN(id)) {
       return res.status(400).json({ error: "Invalid or missing ID." });
     }
@@ -291,21 +291,24 @@ const updateFlat = (req, res, next) => {
   }
 };
 
-const deleteFlat = (req, res, next) => {
+const deleteFlat = async (req, res, next) => {
   const { id } = req.body;
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    const flat = new FlatModel();
-    flat.id = id;
-    flat.status = 0;
-    flat.save((data) =>
-      res.status(201).json({
-        msg: "Flat deleted successfully!",
-      })
-    );
+    // const flat = new FlatModel();
+    // flat.id = id;
+    // flat.status = 0;
+
+    await FlatModel.deleteById(id);
+    await FlatLandDetailsModel.deleteByFlatId(id);
+    await OwnerModel.deleteByFlatId(id);
+
+    res.status(201).json({
+      msg: "Flat deleted successfully!",
+    });
   }
 };
 

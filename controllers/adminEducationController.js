@@ -74,14 +74,16 @@ const getAllEducation = (req, res, next) => {
 
 const getEducation = async (req, res, next) => {
     const { id } = req.params;
-    const convertedId = Number(id);
+    const convertedId = id;
 
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        const data = await EducationModel.educationFindById(convertedId);
+        const data = await EducationModel.educationFindByPortfolioId(
+            convertedId
+        );
         const newDate = data.filter((el) => el.status != 0);
         res.status(200).json({ data: newDate });
     }
@@ -89,7 +91,7 @@ const getEducation = async (req, res, next) => {
 
 const getEducationById = async (req, res, next) => {
     const { id } = req.params;
-    const convertedId = Number(id);
+    const convertedId = id;
 
     if (!id) {
         res.status(500).json({
@@ -101,17 +103,18 @@ const getEducationById = async (req, res, next) => {
     }
 };
 
-const deleteEducation = (req, res, next) => {
+const deleteEducation = async (req, res, next) => {
     const { id } = req.body;
     if (!id) {
         res.status(500).json({
             error: "Need To Pass Id.",
         });
     } else {
-        const education = new EducationModel();
-        education.id = id;
-        education.status = 0;
-        education.save();
+        // const education = new EducationModel();
+        // education.id = id;
+        // education.status = 0;
+        // education.save();
+        await EducationModel.deleteById(id);
         res.status(201).json({
             msg: "Education deleted successfully!",
         });

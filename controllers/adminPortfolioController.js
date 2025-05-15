@@ -78,6 +78,7 @@ const getAllPortfolio = async (req, res, next) => {
     return {
       ...el,
       ...member,
+      id: el.id,
     };
   });
 
@@ -87,7 +88,7 @@ const getAllPortfolio = async (req, res, next) => {
 
 const getPortfolio = async (req, res, next) => {
   const { id } = req.params;
-  const convertedId = Number(id);
+  const convertedId = id;
 
   if (!id) {
     res.status(500).json({
@@ -101,16 +102,16 @@ const getPortfolio = async (req, res, next) => {
 
     // Fetch all dependent data in parallel with error handling
     const [experience, education, member, skills] = await Promise.all([
-      ExperienceModel.experienceFindById(id).catch((err) => {
+      ExperienceModel.experienceFindByPortfolioId(id).catch((err) => {
         console.error("Experience fetch error:", err);
         return null;
       }),
-      EducationModel.educationFindById(id).catch((err) => {
+      EducationModel.educationFindByPortfolioId(id).catch((err) => {
         console.error("Land details fetch error:", err);
         return null;
       }),
       TeamMemberModel.teamMemberById(parseInt(portfolio?.member_id)),
-      SkillModel.skillFindById(id).catch((err) => {
+      SkillModel.skillFindByPortfolioId(id).catch((err) => {
         console.error("Skills fetch error:", err);
         return null;
       }),
@@ -126,27 +127,37 @@ const getPortfolio = async (req, res, next) => {
       experience_details: filterExperience || {},
       education_details: filterEducation || {},
       skills: skills || [],
+      id: portfolio.id,
     };
 
     return res.status(200).json({ data: newData });
   }
 };
 
-const deletePortfolio = (req, res, next) => {
+const deletePortfolio = async (req, res, next) => {
   const { id } = req.body;
   if (!id) {
     res.status(500).json({
       error: "Need To Pass Id.",
     });
   } else {
-    const portfolio = new PortfolioModel();
-    portfolio.id = id;
-    portfolio.status = 0;
-    portfolio.save(() =>
-      res.status(201).json({
-        msg: "Portfolio deleted successfully!",
-      })
-    );
+    // const portfolio = new PortfolioModel();
+    // portfolio.id = id;
+    // portfolio.status = 0;
+    // portfolio.save(() =>
+    //     res.status(201).json({
+    //         msg: "Portfolio deleted successfully!",
+    //     })
+    // );
+
+    await PortfolioModel.deleteById(id);
+    await EducationModel.deleteByPortfolioId(id);
+    await ExperienceModel.deleteByPortfolioId(id);
+    await SkillModel.deleteByPortfolioId(id);
+
+    res.status(201).json({
+      msg: "Portfolio deleted successfully!",
+    });
   }
 };
 
